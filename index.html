@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EMS 調度系統 V3</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', "Microsoft JhengHei", sans-serif;
+            background-color: #121212;
+            color: #e0e0e0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+
+        .container {
+            background-color: #1e1e1e;
+            padding: 2rem;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.7);
+            width: 450px;
+            text-align: center;
+            border: 1px solid #333;
+        }
+
+        h2 {
+            color: #ff4d4d;
+            margin-top: 0;
+            letter-spacing: 3px;
+            font-size: 1.5rem;
+        }
+
+        .mode-selector {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .mode-btn {
+            flex: 1;
+            padding: 10px;
+            border: 2px solid #444;
+            background: #2d2d2d;
+            color: #888;
+            cursor: pointer;
+            border-radius: 8px;
+            font-weight: bold;
+            transition: all 0.2s;
+        }
+
+        .mode-btn.active[data-mode="dispatched"] {
+            border-color: #00ffcc;
+            color: #00ffcc;
+            background: rgba(0, 255, 204, 0.1);
+        }
+
+        .mode-btn.active[data-mode="gps"] {
+            border-color: #ffcc00;
+            color: #ffcc00;
+            background: rgba(255, 204, 0, 0.1);
+        }
+
+        input[type="text"] {
+            width: 90%;
+            padding: 15px;
+            border: 2px solid #444;
+            border-radius: 8px;
+            background-color: #2d2d2d;
+            color: white;
+            font-size: 1.4rem;
+            text-align: center;
+            outline: none;
+            margin-bottom: 15px;
+        }
+
+        input[type="text"]:focus {
+            border-color: #ff4d4d;
+        }
+
+        .result-area {
+            padding: 20px;
+            background-color: #000;
+            border-radius: 8px;
+            min-height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.1rem;
+            line-height: 1.5;
+            cursor: pointer;
+            border: 1px dashed #555;
+            transition: all 0.2s;
+        }
+
+        .result-area.dispatched-style {
+            color: #00ffcc;
+        }
+
+        .result-area.gps-style {
+            color: #ffcc00;
+        }
+
+        .status-msg {
+            height: 25px;
+            margin: 10px 0;
+            color: #afff00;
+            font-weight: bold;
+        }
+
+        .hint-box {
+            text-align: left;
+            background: #2d2d2d;
+            padding: 12px;
+            border-radius: 8px;
+            font-size: 0.85rem;
+            color: #aaa;
+        }
+
+        kbd {
+            background: #444;
+            padding: 2px 5px;
+            border-radius: 4px;
+            color: #fff;
+            font-family: sans-serif;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="container">
+        <h2>EMS 快速回覆系統</h2>
+
+        <div class="mode-selector">
+            <button class="mode-btn active" data-mode="dispatched" onclick="setMode('dispatched')">1. 已派遣</button>
+            <button class="mode-btn" data-mode="gps" onclick="setMode('gps')">2. 要定位 (GPS)</button>
+        </div>
+
+        <input type="text" id="charID" placeholder="輸入 ID 後按 Enter" autocomplete="off" autofocus>
+
+        <div class="result-area dispatched-style" id="output" onclick="copyToClipboard()">
+            等待輸入...
+        </div>
+
+        <div id="status" class="status-msg"></div>
+
+        <div class="hint-box">
+            • <kbd>Enter</kbd>：複製指令並清空輸入框<br>
+            • <kbd>Tab</kbd>：快速切換「已派遣 / 要定位」<br>
+            • 切換後會自動記憶，直到你再次切換
+        </div>
+    </div>
+
+    <script>
+        const input = document.getElementById('charID');
+        const output = document.getElementById('output');
+        const status = document.getElementById('status');
+        const btns = document.querySelectorAll('.mode-btn');
+
+        let currentMode = 'dispatched';
+        const messages = {
+            dispatched: "醫護已派遣，請耐心等候",
+            gps: "請按壓/311p按鈕，發送GPS定位，以利醫護同仁搜救作業"
+        };
+
+        function setMode(mode) {
+            currentMode = mode;
+            btns.forEach(btn => {
+                btn.classList.toggle('active', btn.dataset.mode === mode);
+            });
+            output.className = `result-area ${mode}-style`;
+            updateOutput();
+        }
+
+        function updateOutput() {
+            const val = input.value.trim();
+            if (val) {
+                output.innerText = `/311r ${val} ${messages[currentMode]}`;
+            } else {
+                output.innerText = '等待輸入...';
+            }
+        }
+
+        input.addEventListener('input', updateOutput);
+
+        input.addEventListener('keydown', (e) => {
+            // Tab 鍵切換模式
+            if (e.key === 'Tab') {
+                e.preventDefault();
+                setMode(currentMode === 'dispatched' ? 'gps' : 'dispatched');
+            }
+            // Enter 鍵複製
+            if (e.key === 'Enter') {
+                if (input.value.trim() !== "") {
+                    copyToClipboard();
+                    input.value = '';
+                    updateOutput();
+                }
+            }
+        });
+
+        function copyToClipboard() {
+            const text = output.innerText;
+            if (text === '等待輸入...' || text.includes('✅')) return;
+
+            navigator.clipboard.writeText(text).then(() => {
+                const originalText = output.innerText;
+                status.innerText = '✅ 已複製！';
+                setTimeout(() => { status.innerText = ''; }, 1000);
+            });
+        }
+    </script>
+
+</body>
+
+</html>
