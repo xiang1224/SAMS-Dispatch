@@ -4,120 +4,278 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>EMS 調度系統 V3</title>
+    <title>MedLink Dispatch</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="shortcut icon" href="contacts.png" type="image/x-icon">
     <style>
-        body {
-            font-family: 'Segoe UI', "Microsoft JhengHei", sans-serif;
-            background-color: #121212;
-            color: #e0e0e0;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            margin: 0;
+        :root {
+            --bg-main: #121212;
+            --bg-container: #1e1e1e;
+            --bg-input: #2d2d2d;
+            --primary: #ff4d4d;
+            --text-main: #e0e0e0;
+            --text-muted: #888;
+            --success: #00ffcc;
+            --warning: #ffcc00;
         }
 
-        .container {
-            background-color: #1e1e1e;
-            padding: 2rem;
+        body {
+            font-family: 'Segoe UI', "Microsoft JhengHei", sans-serif;
+            background-color: var(--bg-main);
+            color: var(--text-main);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            /* 垂直居中 */
+            align-items: center;
+            /* 水平居中 */
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+
+        .main-card {
+            background-color: var(--bg-container);
             border-radius: 15px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.7);
-            width: 450px;
-            text-align: center;
             border: 1px solid #333;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.7);
+            width: 100%;
+            max-width: 1000px;
         }
 
         h2 {
-            color: #ff4d4d;
-            margin-top: 0;
-            letter-spacing: 3px;
-            font-size: 1.5rem;
+            color: var(--primary);
+            letter-spacing: 2px;
         }
 
-        .mode-selector {
-            display: flex;
-            gap: 10px;
-            margin-bottom: 20px;
+        /* Tabs */
+        .nav-tabs {
+            border-bottom: 2px solid #333;
         }
 
-        .mode-btn {
-            flex: 1;
-            padding: 10px;
-            border: 2px solid #444;
-            background: #2d2d2d;
-            color: #888;
-            cursor: pointer;
-            border-radius: 8px;
+        .nav-tabs .nav-link {
+            color: var(--text-muted);
+            border: none;
             font-weight: bold;
-            transition: all 0.2s;
+            background: transparent;
+        }
+
+        .nav-tabs .nav-link.active {
+            background: transparent;
+            color: var(--primary);
+            border-bottom: 3px solid var(--primary);
+        }
+
+        .nav-tabs .nav-link:hover {
+            border-color: transparent;
+            color: white;
+        }
+
+        /* 調度按鈕樣式 */
+        .mode-btn {
+            border: 2px solid #444;
+            background: var(--bg-input);
+            color: #aaa;
+            font-weight: bold;
+            transition: all 0.2s ease-in-out;
+            padding: 12px;
+        }
+
+        .mode-btn:focus,
+        .mode-btn:active,
+        .mode-btn:focus-visible,
+        .btn-check:checked+.btn,
+        .btn.active {
+            box-shadow: none !important;
+            outline: none !important;
+            background: var(--bg-input);
+            color: #aaa;
+            border-color: #444;
+        }
+
+        .mode-btn:hover {
+            background: #383838 !important;
+            border-color: #666 !important;
+            color: white !important;
         }
 
         .mode-btn.active[data-mode="dispatched"] {
-            border-color: #00ffcc;
-            color: #00ffcc;
-            background: rgba(0, 255, 204, 0.1);
+            border-color: var(--success) !important;
+            color: var(--success) !important;
+            background: rgba(0, 255, 204, 0.08) !important;
+            text-shadow: 0 0 5px rgba(0, 255, 204, 0.3);
+            box-shadow: inset 0 0 8px rgba(0, 255, 204, 0.05) !important;
+        }
+
+        .mode-btn.active[data-mode="dispatched"]:hover {
+            background: rgba(0, 255, 204, 0.15) !important;
         }
 
         .mode-btn.active[data-mode="gps"] {
-            border-color: #ffcc00;
-            color: #ffcc00;
-            background: rgba(255, 204, 0, 0.1);
+            border-color: var(--warning) !important;
+            color: var(--warning) !important;
+            background: rgba(255, 204, 0, 0.08) !important;
+            text-shadow: 0 0 5px rgba(255, 204, 0, 0.3);
+            box-shadow: inset 0 0 8px rgba(255, 204, 0, 0.05) !important;
         }
 
-        input[type="text"] {
-            width: 90%;
-            padding: 15px;
+        .mode-btn.active[data-mode="gps"]:hover {
+            background: rgba(255, 204, 0, 0.15) !important;
+        }
+
+        /* Input */
+        .form-control {
+            background-color: var(--bg-input);
             border: 2px solid #444;
-            border-radius: 8px;
-            background-color: #2d2d2d;
             color: white;
-            font-size: 1.4rem;
-            text-align: center;
-            outline: none;
-            margin-bottom: 15px;
         }
 
-        input[type="text"]:focus {
-            border-color: #ff4d4d;
+        .form-control:focus {
+            background-color: var(--bg-input);
+            color: white;
+            border-color: var(--primary);
+            box-shadow: none;
         }
 
+        .form-control::placeholder {
+            color: #aaa !important;
+            opacity: 1;
+        }
+
+        /* Result Area */
         .result-area {
-            padding: 20px;
-            background-color: #000;
+            background-color: #050505;
             border-radius: 8px;
             min-height: 60px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.1rem;
-            line-height: 1.5;
-            cursor: pointer;
             border: 1px dashed #555;
-            transition: all 0.2s;
+            color: var(--success);
+            cursor: pointer;
+            transition: 0.15s;
         }
 
-        .result-area.dispatched-style {
-            color: #00ffcc;
+        .result-area:hover {
+            background: #111;
         }
 
-        .result-area.gps-style {
-            color: #ffcc00;
+        /* Sidebar */
+        .sidebar {
+            background: #151515;
+            border: 1px solid #333;
+            border-radius: 8px;
+            height: 450px;
         }
 
+        .injury-list {
+            overflow-y: auto;
+            flex: 1;
+        }
+
+        .injury-item {
+            padding: 10px 12px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.95rem;
+            color: #bbb;
+            transition: all 0.15s;
+            border-left: 3px solid transparent;
+        }
+
+        .injury-item:hover {
+            background: #252525;
+            color: white;
+        }
+
+        .injury-item.active {
+            background: #2d2424;
+            color: var(--primary);
+            border-left-color: var(--primary);
+            font-weight: bold;
+        }
+
+        /* Main Panel */
+        .main-panel {
+            background: #0a0a0a;
+            border: 1px solid #333;
+            border-radius: 8px;
+            height: 450px;
+            overflow-y: auto;
+        }
+
+        .step-item {
+            padding: 12px 15px;
+            background-color: #1a1a1a;
+            border: 1px solid #333;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.15s;
+            color: #e0e0e0;
+        }
+
+        .step-item:hover {
+            background-color: #222;
+            transform: translateX(2px);
+        }
+
+        .step-item.next-up {
+            border-color: var(--primary);
+            background-color: #251b1b;
+            box-shadow: 0 0 8px rgba(255, 77, 77, 0.15);
+        }
+
+        .step-item.copied {
+            opacity: 0.7;
+            border-color: #222;
+            background-color: #111;
+            text-decoration: line-through;
+            color: #999;
+        }
+
+        /* 階段分隔線 */
+        .section-divider {
+            padding: 6px 12px;
+            background: #222;
+            color: #888;
+            font-weight: bold;
+            font-size: 0.8rem;
+            text-align: center;
+            letter-spacing: 2px;
+            border-radius: 4px;
+            margin: 4px 0;
+            border: 1px solid #2a2a2a;
+            cursor: default !important;
+            transform: none !important;
+        }
+
+        .copy-badge {
+            font-size: 0.75rem;
+            padding: 2px 6px;
+            background: #333;
+            border-radius: 4px;
+            color: #ddd;
+        }
+
+        .step-item.next-up .copy-badge {
+            background: var(--primary);
+            color: white;
+            font-weight: bold;
+        }
+
+        /* Status */
         .status-msg {
             height: 25px;
-            margin: 10px 0;
             color: #afff00;
             font-weight: bold;
         }
 
+        /* Hint */
         .hint-box {
-            text-align: left;
-            background: #2d2d2d;
-            padding: 12px;
+            background: var(--bg-input);
             border-radius: 8px;
-            font-size: 0.85rem;
             color: #aaa;
+            font-size: 0.85rem;
+            line-height: 1.5;
         }
 
         kbd {
@@ -125,96 +283,494 @@
             padding: 2px 5px;
             border-radius: 4px;
             color: #fff;
-            font-family: sans-serif;
+        }
+
+        /* 著作權頁尾樣式（修正置中對齊） */
+        .custom-footer {
+            width: 100%;
+            max-width: 1000px;
+            text-align: center;
+            padding-top: 20px;
+            margin-top: 20px;
+            border-top: 1px solid #222;
+            color: #555;
+            font-size: 0.85rem;
+            letter-spacing: 1px;
+        }
+
+        /* Scrollbar */
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #444;
+            border-radius: 10px;
         }
     </style>
 </head>
 
 <body>
 
-    <div class="container">
-        <h2>EMS 快速回覆系統</h2>
+    <div class="card main-card p-4">
 
-        <div class="mode-selector">
-            <button class="mode-btn active" data-mode="dispatched" onclick="setMode('dispatched')">1. 已派遣</button>
-            <button class="mode-btn" data-mode="gps" onclick="setMode('gps')">2. 要定位 (GPS)</button>
+        <h2 class="text-center mb-4">MedLink Dispatch</h2>
+
+        <ul class="nav nav-tabs justify-content-center mb-4" id="mainTabs">
+            <li class="nav-item">
+                <button class="nav-link active" data-bs-toggle="tab" data-bs-target="#dispatch-tab">
+                    311r 調度
+                </button>
+            </li>
+            <li class="nav-item">
+                <button class="nav-link" data-bs-toggle="tab" data-bs-target="#treatment-tab">
+                    醫療 /me 小助手
+                </button>
+            </li>
+        </ul>
+
+        <div class="tab-content">
+
+            <div class="tab-pane fade show active" id="dispatch-tab">
+
+                <div class="row g-2 mb-3">
+                    <div class="col-md-6">
+                        <button class="btn w-100 mode-btn active" data-mode="dispatched"
+                            onclick="setDispatchMode('dispatched')">
+                            1. 已派遣
+                        </button>
+                    </div>
+                    <div class="col-md-6">
+                        <button class="btn w-100 mode-btn" data-mode="gps" onclick="setDispatchMode('gps')">
+                            2. 詢問定位 (GPS)
+                        </button>
+                    </div>
+                </div>
+
+                <input type="text" id="charID" class="form-control text-center py-3 fs-5 mb-3"
+                    placeholder="輸入 ID 後按 Enter" autocomplete="off" autofocus>
+
+                <div id="dispatch-output"
+                    class="result-area d-flex justify-content-center align-items-center p-4 fs-5 mb-2"
+                    onclick="copyDispatch()">
+                    等待輸入...
+                </div>
+
+                <div id="dispatch-status" class="status-msg text-center mb-3"></div>
+
+                <div class="hint-box p-3">
+                    • <kbd>Enter</kbd>：複製指令並清空輸入框<br>
+                    • <kbd>Tab</kbd>：快速切換「已派遣 / 要定位」
+                </div>
+
+            </div>
+
+            <div class="tab-pane fade" id="treatment-tab">
+
+                <div class="row g-3">
+                    <div class="col-lg-4">
+                        <div class="sidebar d-flex flex-column p-2">
+                            <input type="text" id="searchBar" class="form-control mb-2" placeholder="🔍 搜尋傷勢... (快捷鍵 F)"
+                                autocomplete="off">
+                            <div class="injury-list d-flex flex-column gap-1" id="injury-container"></div>
+                        </div>
+                    </div>
+
+                    <div class="col-lg-8">
+                        <div class="main-panel p-3 d-flex flex-column gap-2" id="step-container"></div>
+                    </div>
+                </div>
+
+                <div id="treatment-status" class="status-msg text-center mt-3"></div>
+
+                <div class="hint-box p-3 mt-2">
+                    • <kbd>F</kbd>：快速聚焦搜尋框 |
+                    <kbd>↑</kbd> <kbd>↓</kbd>：切換傷勢項目 |
+                    <kbd>Tab</kbd>：選定該傷勢並切換到步驟<br>
+                    • <kbd>Enter</kbd>：自動複製右側紅框步驟，複製完切回遊戲貼上
+                </div>
+
+            </div>
+
         </div>
 
-        <input type="text" id="charID" placeholder="輸入 ID 後按 Enter" autocomplete="off" autofocus>
-
-        <div class="result-area dispatched-style" id="output" onclick="copyToClipboard()">
-            等待輸入...
-        </div>
-
-        <div id="status" class="status-msg"></div>
-
-        <div class="hint-box">
-            • <kbd>Enter</kbd>：複製指令並清空輸入框<br>
-            • <kbd>Tab</kbd>：快速切換「已派遣 / 要定位」<br>
-            • 切換後會自動記憶，直到你再次切換
-        </div>
     </div>
 
-    <script>
-        const input = document.getElementById('charID');
-        const output = document.getElementById('output');
-        const status = document.getElementById('status');
-        const btns = document.querySelectorAll('.mode-btn');
+    <footer class="custom-footer">
+        &copy; 2026 暈船仔丨小翔丨. All rights reserved.
+    </footer>
 
-        let currentMode = 'dispatched';
-        const messages = {
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+        // ==========================================
+        // 資料庫中心
+        // ==========================================
+    const treatmentMessages = {
+
+        "abrasion": {
+            name: "大面積擦挫傷處置",
+            steps: [
+                "/me 使用生理食鹽水沖洗傷口泥沙與雜質",
+                "/me 使用優碘消毒受傷部位",
+                "/me 塗抹抗生素消炎軟膏",
+                "/me 覆蓋無菌紗布並使用網狀繃帶包紮"
+            ]
+        },
+        "bullet": {
+            name: "穿透性槍傷/彈片移除術",
+            steps: [
+                "/me 使用生理食鹽水灌洗槍傷彈孔",
+                "/me 進行術區消毒並鋪設無菌洞巾",
+                "/me 於患部周圍施打局部麻醉",
+                "/me 使用手術刀擴大傷口並用血管鉗夾出子彈彈片",
+                "/me 使用外科剪刀剪除彈道周圍壞死組織",
+                "/me 使用帶針縫線間斷縫合深層組織與皮膚",
+                "/me 塗抹抗生素藥膏並覆蓋紗布加壓貼牢"
+            ]
+        },
+        "mild_burn": {
+            name: "輕度燒燙傷（一度至淺二度）處置",
+            steps: [
+                "---- 院外應急處置 ----",
+                "/me 使用低溫生理食鹽水持續沖洗",
+                "---- 院內常規處置 ----",
+                "/me 使用無菌生理食鹽水溫和清潔燙傷區域",
+                "/me 對完整未破裂的水泡進行消毒並保留表皮",
+                "/me 使用無菌針頭對過大水泡進行低位引流排空組織液",
+                "/me 於患部均勻塗抹一層石蠟燙傷膏",
+                "/me 使用無菌疏鬆紗布覆蓋並以網狀繃帶輕柔固定",
+            ]
+        },
+        "burn": {
+            name: "深二度燒燙傷清創處置",
+            steps: [
+                "/me 使用低溫生理食鹽水持續沖洗",
+                "/me 建立靜脈通道並注射止痛藥物",
+                "/me 使用無菌鑷子與外科剪刀清除壞死表皮組織",
+                "/me 以抗菌溶液與生理食鹽水交替沖洗傷口",
+                "/me 均勻塗抹磺胺銀燒燙傷專用藥膏",
+                "/me 覆蓋無菌疏鬆紗布並以彈性繃帶纏繞固定"
+            ]
+        },
+
+        "fracture_surgery": {
+            name: "骨折固定與復位手術",
+            steps: [
+                "---- 院外應急處置 ----",
+                "/me 使用夾板固定患肢",
+                "---- 院內手術程序 ----",
+                "/me On IC，並輸注生理食鹽水",
+                "/me On Monitor(監測心跳、血壓與血氧)",
+                "/me 經由靜脈注射全身麻醉藥物",
+                "/me 執行氣管內插管並連接呼吸器",
+                "/me 使用手術刀切開骨折患部皮膚與皮下組織",
+                "/me 使用撐開器顯露骨折斷端",
+                "/me 以生理食鹽水沖洗並移除碎骨與異物",
+                "/me 使用骨復位鉗將骨折復位並安置鎖定鋼板",
+                "/me 鑽孔並鎖入螺釘固定鋼板與骨骼",
+                "/me 利用移動式X光機(C-Arm)確認對位",
+                "/me 縫合受損血管與神經",
+                "/me 依解剖層次逐層縫合筋膜與肌肉組織",
+                "/me 縫合皮膚表面",
+                "/me 傷口覆蓋無菌敷料並使用繃帶固定",
+                "/me 石膏固定患肢"
+            ]
+        },
+        "drowning": {
+            name: "溺水與呼吸衰竭急救",
+            steps: [
+                "---- 院外應急處置 ----",
+                "/me 清除患者口鼻內泥沙與嘔吐物，保持呼吸道通暢",
+                "/me 給予高濃度氧氣面罩",
+                "---- 院內搶救程序 ----",
+                "/me 建立靜脈通道並裝上生命徵象監測儀",
+                "/me 使用溫毯與溫熱點滴進行中心主體復溫"
+            ]
+        },
+        "hypoglycemia": {
+            name: "低血糖昏迷處置",
+            steps: [
+                "---- 院外應急處置 ----",
+                "/me 建立靜脈通路，緩慢推注高濃度葡萄糖溶液（D50）",
+                "---- 院內治療程序 ----",
+                "/me 靜脈滴注維持性葡萄糖輸液（D10）",
+                "/me 定時監測每 15 分鐘的末梢血糖變化"
+            ]
+        },
+        "foreign": {
+            name: "深部異物/玻璃碎片取出術",
+            steps: [
+                "/me 使用生理食鹽水沖洗周圍血跡",
+                "/me 使用優點從傷口邊緣向外進行消毒",
+                "/me 使用精密醫療鑷子深入傷口夾除義務碎片",
+                "/me 使用生理食鹽水深入傷口內部進行壓力灌洗",
+                "/me 塗抹抗生素軟膏",
+                "/me 覆蓋無菌敷料膠帶固定"
+            ]
+        },
+        "thoracic_rupture": {
+            name: "胸腔破裂與開放性氣胸手術",
+            steps: [
+                "---- 院外應急處置 ----",
+                "/me 使用無菌加壓敷料覆蓋胸壁開放性傷口",
+                "/me 執行胸腔針刺減壓術以釋放張力性氣胸壓力",
+                "---- 院內手術程序 ----",
+                "/me 建立雙路大口徑靜脈留置針並快速輸血",
+                "/me 執行氣管內插管並連接呼吸器正壓給氧",
+                "/me 經由靜脈注射全身麻醉與肌肉鬆弛劑",
+                "/me 使用手術刀進行開胸手術切開胸壁",
+                "/me 置入胸腔置開器撐開肋骨顯露胸腔",
+                "/me 使用強力吸引器清除胸腔內大量積血",
+                "/me 使用血管鉗快速夾閉活動性噴血血管",
+                "/me 探查肺臟裂傷並使用組織縫合器進行修補",
+                "/me 檢查心臟及大血管壁並進行細緻縫合",
+                "/me 使用大量溫生理食鹽水徹底沖洗胸腔",
+                "/me 於患側置入胸腔引流管並連接水封瓶",
+                "/me 使用不銹鋼鋼絲固定並縫合肋骨",
+                "/me 依序逐層縫合胸壁肌肉、皮下組織與皮膚",
+                "/me 覆蓋無菌敷料並加壓固定"
+            ]
+        },
+        "abdominal_rupture": {
+            name: "腹腔臟器破裂與大出血手術",
+            steps: [
+                "---- 院外應急處置 ----",
+                "/me 使用無菌濕敷料覆蓋保護脫出之腹腔臟器",
+                "/me 建立靜脈通道並給予限額補液維持血壓",
+                "---- 院內手術程序 ----",
+                "/me 建立中心靜脈導管並啟動大量輸血協定",
+                "/me 執行氣管內插管並引導全身麻醉狀態",
+                "/me 使用手術刀沿腹正中線切開腹壁各層組織",
+                "/me 使用腹腔撐開器顯露腹腔視野",
+                "/me 使用吸引器迅速吸除腹腔內積血與胃腸內容物",
+                "/me 使用大量手術紗布墊進行全腹腔壓迫止血",
+                "/me 探查肝脾等實質臟器裂傷並使用止血鉗夾閉",
+                "/me 執行肝臟精密縫合止血",
+                "/me 探查胃腸道破裂處並使用腸吻合器進行修補",
+                "/me 使用數千毫升溫生理食鹽水反覆灌洗腹腔",
+                "/me 於腹腔低位安置兩支矽膠引流管",
+                "/me 仔細清點手術紗布與器械數目無誤",
+                "/me 使用高強度縫線逐層縫合腹膜、筋膜與肌肉",
+                "/me 使用外科縫線關閉腹壁皮膚傷口",
+                "/me 敷設無菌敷料並妥善黏貼固定"
+            ]
+        },
+    };
+        let currentInjuryKey = 'fracture_surgery';
+        let currentStepIndex = 0;
+        let filteredKeys = Object.keys(treatmentMessages);
+
+        // ==========================================
+        // Dispatch Logic
+        // ==========================================
+        const input = document.getElementById('charID');
+        const dispatchOutput = document.getElementById('dispatch-output');
+        const dispatchStatus = document.getElementById('dispatch-status');
+
+        let currentDispatchMode = 'dispatched';
+
+        const dispatchMessages = {
             dispatched: "醫護已派遣，請耐心等候",
             gps: "請按壓/311p按鈕，發送GPS定位，以利醫護同仁搜救作業"
         };
 
-        function setMode(mode) {
-            currentMode = mode;
-            btns.forEach(btn => {
+        function setDispatchMode(mode) {
+            currentDispatchMode = mode;
+
+            document.querySelectorAll('.mode-btn').forEach(btn => {
                 btn.classList.toggle('active', btn.dataset.mode === mode);
             });
-            output.className = `result-area ${mode}-style`;
-            updateOutput();
+
+            dispatchOutput.style.color = mode === 'dispatched' ? '#00ffcc' : '#ffcc00';
+            updateDispatchOutput();
         }
 
-        function updateOutput() {
+        function updateDispatchOutput() {
             const val = input.value.trim();
-            if (val) {
-                output.innerText = `/311r ${val} ${messages[currentMode]}`;
-            } else {
-                output.innerText = '等待輸入...';
+            dispatchOutput.innerText = val ? `/311r ${val} ${dispatchMessages[currentDispatchMode]}` : '等待輸入...';
+        }
+
+        input.addEventListener('input', updateDispatchOutput);
+
+        // ==========================================
+        // Medical Logic
+        // ==========================================
+        const searchBar = document.getElementById('searchBar');
+        const injuryContainer = document.getElementById('injury-container');
+        const stepContainer = document.getElementById('step-container');
+        const treatmentStatus = document.getElementById('treatment-status');
+
+        function initMedicalTab() {
+            renderInjuryList();
+            checkAndSkipDivider();
+            renderSteps();
+        }
+
+        function checkAndSkipDivider() {
+            const steps = treatmentMessages[currentInjuryKey]?.steps || [];
+            if (steps[currentStepIndex] && steps[currentStepIndex].startsWith('----')) {
+                currentStepIndex++;
             }
         }
 
-        input.addEventListener('input', updateOutput);
+        searchBar.addEventListener('input', () => {
+            const query = searchBar.value.toLowerCase().trim();
 
-        input.addEventListener('keydown', (e) => {
-            // Tab 鍵切換模式
-            if (e.key === 'Tab') {
-                e.preventDefault();
-                setMode(currentMode === 'dispatched' ? 'gps' : 'dispatched');
+            filteredKeys = Object.keys(treatmentMessages).filter(key => {
+                return treatmentMessages[key].name.toLowerCase().includes(query) || key.includes(query);
+            });
+
+            renderInjuryList();
+
+            if (filteredKeys.length > 0 && !filteredKeys.includes(currentInjuryKey)) {
+                selectInjury(filteredKeys[0]);
             }
-            // Enter 鍵複製
-            if (e.key === 'Enter') {
-                if (input.value.trim() !== "") {
-                    copyToClipboard();
-                    input.value = '';
-                    updateOutput();
+        });
+
+        function renderInjuryList() {
+            injuryContainer.innerHTML = '';
+            filteredKeys.forEach(key => {
+                const div = document.createElement('div');
+                div.className = `injury-item ${key === currentInjuryKey ? 'active' : ''}`;
+                div.innerText = treatmentMessages[key].name;
+                div.onclick = () => selectInjury(key);
+                injuryContainer.appendChild(div);
+            });
+        }
+
+        function selectInjury(key) {
+            currentInjuryKey = key;
+            currentStepIndex = 0;
+            renderInjuryList();
+            checkAndSkipDivider();
+            renderSteps();
+        }
+
+        function renderSteps() {
+            stepContainer.innerHTML = '';
+            const data = treatmentMessages[currentInjuryKey];
+            if (!data) return;
+
+            data.steps.forEach((text, index) => {
+                const div = document.createElement('div');
+
+                if (text.startsWith('----')) {
+                    div.className = 'section-divider';
+                    div.innerText = text.replace(/^-+\s*|\s*-+$/g, '');
+                    stepContainer.appendChild(div);
+                    return;
+                }
+
+                div.className = 'step-item';
+
+                if (index === currentStepIndex) div.classList.add('next-up');
+                if (index < currentStepIndex) div.classList.add('copied');
+
+                div.innerHTML = `
+                    <div class="d-flex justify-content-between align-items-center">
+                        <span>${text}</span>
+                        <span class="copy-badge">
+                            ${index === currentStepIndex
+                        ? 'ENTER 複製'
+                        : (index < currentStepIndex ? '已複製' : '點擊複製')
+                    }
+                        </span>
+                    </div>
+                `;
+
+                div.onclick = () => {
+                    copyText(text);
+                    currentStepIndex = index + 1;
+                    checkAndSkipDivider();
+                    renderSteps();
+                };
+                stepContainer.appendChild(div);
+            });
+        }
+
+        function copyText(text) {
+            navigator.clipboard.writeText(text).then(() => {
+                treatmentStatus.innerText = `✅ 已複製: "${text}"`;
+                setTimeout(() => { treatmentStatus.innerText = ''; }, 800);
+            });
+        }
+
+        // ==========================================
+        // Global Shortcuts
+        // ==========================================
+        document.addEventListener('keydown', (e) => {
+            const isDispatchActive = document.getElementById('dispatch-tab').classList.contains('active');
+
+            if (isDispatchActive) {
+                if (e.key === 'Tab') {
+                    e.preventDefault();
+                    setDispatchMode(currentDispatchMode === 'dispatched' ? 'gps' : 'dispatched');
+                }
+
+                if (e.key === 'Enter') {
+                    if (input.value.trim() !== "") {
+                        copyDispatch();
+                        input.value = '';
+                        updateDispatchOutput();
+                    }
+                }
+            } else {
+                if (e.key.toLowerCase() === 'f' && document.activeElement !== searchBar) {
+                    e.preventDefault();
+                    searchBar.focus();
+                    searchBar.select();
+                }
+
+                if (document.activeElement === searchBar) {
+                    let currentIndex = filteredKeys.indexOf(currentInjuryKey);
+
+                    if (e.key === 'ArrowDown') {
+                        e.preventDefault();
+                        let nextIndex = (currentIndex + 1) % filteredKeys.length;
+                        selectInjury(filteredKeys[nextIndex]);
+                    }
+
+                    if (e.key === 'ArrowUp') {
+                        e.preventDefault();
+                        let prevIndex = (currentIndex - 1 + filteredKeys.length) % filteredKeys.length;
+                        selectInjury(filteredKeys[prevIndex]);
+                    }
+
+                    if (e.key === 'Tab' || e.key === 'Enter') {
+                        e.preventDefault();
+                        searchBar.blur();
+                    }
+                    return;
+                }
+
+                if (e.key === 'Enter') {
+                    const steps = treatmentMessages[currentInjuryKey].steps;
+
+                    if (currentStepIndex < steps.length) {
+                        copyText(steps[currentStepIndex]);
+                        currentStepIndex++;
+                        checkAndSkipDivider();
+                        renderSteps();
+                    } else {
+                        treatmentStatus.innerText = '✨ 本輪處置已全部完成！按 F 搜尋下一單。';
+                    }
                 }
             }
         });
 
-        function copyToClipboard() {
-            const text = output.innerText;
-            if (text === '等待輸入...' || text.includes('✅')) return;
+        function copyDispatch() {
+            const text = dispatchOutput.innerText;
+            if (text === '等待輸入...') return;
 
             navigator.clipboard.writeText(text).then(() => {
-                const originalText = output.innerText;
-                status.innerText = '✅ 已複製！';
-                setTimeout(() => { status.innerText = ''; }, 1000);
+                dispatchStatus.innerText = '✅ 已複製調度指令！';
+                setTimeout(() => { dispatchStatus.innerText = ''; }, 1000);
             });
         }
-    </script>
 
+        initMedicalTab();
+    </script>
 </body>
 
 </html>
