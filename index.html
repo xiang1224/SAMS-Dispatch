@@ -16,7 +16,6 @@
             --primary: #ff4d4d;
             --text-main: #e0e0e0;
             --text-muted: #bbbbbb;
-            /* 核心：調亮基礎淺灰 */
             --success: #00ffcc;
             --warning: #ffcc00;
 
@@ -49,11 +48,142 @@
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.7);
             width: 100%;
             max-width: 1000px;
+            position: relative;
         }
 
         h2 {
             color: var(--primary);
             letter-spacing: 2px;
+        }
+
+
+        /* --- 醫藥費展開面板專屬 CSS --- */
+        .fee-toggle-btn {
+            background: linear-gradient(135deg, #2e7d32 0%, #1b5e20 100%);
+            color: white;
+            border: 1px solid #388e3c;
+            border-radius: 20px;
+            /* 讓按鈕變成漂亮的圓角膠囊狀 */
+            font-weight: 600;
+            font-size: 0.9rem;
+            letter-spacing: 0.5px;
+            transition: all 0.2s ease;
+            cursor: pointer;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        }
+
+        .fee-toggle-btn:hover {
+            background: linear-gradient(135deg, #388e3c 0%, #2e7d32 100%);
+            box-shadow: 0 0 8px rgba(0, 255, 204, 0.3);
+            /* 滑鼠懸停時微發光 */
+            transform: translateY(-1px);
+            /* 輕微浮起感 */
+        }
+
+        .fee-toggle-btn:active {
+            transform: translateY(1px);
+        }
+
+        /* 核心：動態平滑展開與折疊控制 */
+        .fee-panel {
+            background-color: #161616;
+            border: 1px solid #2d2d2d;
+            border-radius: 8px;
+            display: none;
+            /* 預設不佔空間，由 JS 控制展開 */
+            overflow: hidden;
+        }
+
+        .fee-card-wrapper {
+            background-color: #1e1e1e;
+            border: 1px solid #2d2d2d;
+            border-radius: 6px;
+            padding: 15px;
+        }
+
+        .fee-section-title {
+            font-size: 0.85rem;
+            font-weight: bold;
+            color: var(--warning);
+            margin-bottom: 8px;
+            letter-spacing: 0.5px;
+        }
+
+        .fee-checkbox-label {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: #252525;
+            border: 1px solid #333;
+            padding: 6px 10px;
+            border-radius: 4px;
+            margin-bottom: 4px;
+            cursor: pointer;
+            transition: background 0.15s;
+        }
+
+        .fee-checkbox-label:hover {
+            background-color: #2d2d2d;
+        }
+
+        /* 輸入框美化 */
+        .fee-input-style {
+            width: 75px !important;
+            height: 24px !important;
+            padding: 0 5px !important;
+            background-color: #161616 !important;
+            color: white !important;
+            border: 1px solid #444 !important;
+            font-size: 0.85rem !important;
+            text-align: center;
+        }
+
+        .fee-stay-input {
+            width: 55px !important;
+            height: 24px !important;
+            padding: 0 5px !important;
+            background-color: #161616 !important;
+            color: white !important;
+            border: 1px solid #444 !important;
+            font-size: 0.85rem !important;
+            text-align: center;
+        }
+
+        /* 總計大框框 */
+        .fee-total-box {
+            background-color: #111;
+            border: 1px dashed var(--success);
+            border-radius: 6px;
+            font-size: 1rem;
+            letter-spacing: 0.5px;
+            transition: background 0.2s;
+        }
+
+        .fee-total-box:hover {
+            background-color: #16221f;
+        }
+
+        /* 右側即時收據明細的專屬黑框 */
+        .fee-invoice-preview {
+            background: #0d0d0d;
+            border: 1px dashed #444;
+            border-radius: 4px;
+            height: 125px;
+            /* 精準控制高度，避免撐開版面造成高低不均 */
+            overflow-y: auto;
+            font-family: monospace;
+            color: #00ffcc;
+            text-shadow: 0 0 2px rgba(0, 255, 204, 0.3);
+        }
+
+        /* 滾動條美化 */
+        .fee-invoice-preview::-webkit-scrollbar {
+            width: 4px;
+        }
+
+        .fee-invoice-preview::-webkit-scrollbar-thumb {
+            background: #333;
+            border-radius: 2px;
         }
 
         /* Tabs */
@@ -137,7 +267,6 @@
             box-shadow: none;
         }
 
-        /* 🛠️ 修正 1：強制把輸入框提示字改成清晰的亮灰色，並將不透明度設為 100% */
         .form-control::placeholder {
             color: #bbbbbb !important;
             opacity: 1 !important;
@@ -179,7 +308,6 @@
             cursor: pointer;
             font-size: 0.95rem;
             color: #eee;
-            /* 調亮預設文字 */
             transition: all 0.15s;
             border-left: 4px solid transparent;
             font-weight: bold;
@@ -248,7 +376,6 @@
         .drug-table th {
             background: #151515;
             color: #ddd;
-            /* 頂部標題調亮 */
             font-size: 0.85rem;
             padding: 12px;
             border-bottom: 2px solid #222;
@@ -274,7 +401,6 @@
             font-size: 0.95rem;
         }
 
-        /* 🛠️ 修正 2：強制為藥物效果說明建立一個高亮白色的 CSS 類別，徹底脫離背景 */
         .drug-effect-highlight {
             color: #e0e0e0 !important;
             font-size: 0.95rem;
@@ -288,9 +414,9 @@
             border-radius: 4px;
             border: 1px dashed #333;
             font-family: monospace;
-            display: block;      /* 改為 block 讓它充滿欄位 */
-            word-break: break-all; /* 核心：允許在任何地方自動斷行 */
-            white-space: normal;  /* 核心：允許正常換行，不再強制單行 */
+            display: block;
+            word-break: break-all;
+            white-space: normal;
         }
 
         .drug-row:hover .table-drug-me {
@@ -327,7 +453,6 @@
             color: #999;
         }
 
-        /* 階段分隔線 */
         .section-divider {
             padding: 6px 12px;
             background: #222;
@@ -364,9 +489,9 @@
         }
 
         .hint-box {
-            background: rgba(255, 77, 77, 0.03); /* 微弱的科技紅底色 */
+            background: rgba(255, 77, 77, 0.03);
             border: 1px solid rgba(255, 77, 77, 0.2);
-            border-left: 4px solid var(--primary); /* 左側標誌性紅邊 */
+            border-left: 4px solid var(--primary);
             border-radius: 6px;
             color: #dcdcdc;
             font-size: 0.85rem;
@@ -375,7 +500,6 @@
             box-shadow: inset 0 0 10px rgba(255, 77, 77, 0.05);
         }
 
-        /* 讓提示框內的快捷鍵小標籤（kbd）更有質感 */
         kbd {
             background: #2a2a2a;
             border: 1px solid #444;
@@ -385,7 +509,6 @@
             box-shadow: 0 2px 0 #111;
         }
 
-        /* 頁尾樣式 */
         .custom-footer {
             width: 100%;
             max-width: 1000px;
@@ -418,109 +541,262 @@
 
 <body>
 
-<div class="card main-card p-4">
-    <h2 class="text-center mb-4">MedLink Dispatch</h2>
-
-    <ul class="nav nav-tabs justify-content-center mb-4" id="mainTabs">
-        <li class="nav-item">
-            <button class="nav-link active" data-bs-toggle="tab" data-bs-target="#dispatch-tab">311r 調度</button>
-        </li>
-        <li class="nav-item">
-            <button class="nav-link" data-bs-toggle="tab" data-bs-target="#treatment-tab">醫療 /me 主控台</button>
-        </li>
-        <li class="nav-item">
-            <button class="nav-link" data-bs-toggle="tab" data-bs-target="#drugs-tab"
-                onclick="renderDrugTable()">常用藥物指南</button>
-        </li>
-    </ul>
-
-    <div class="tab-content">
-        <div class="tab-pane fade show active" id="dispatch-tab">
-            <div class="row g-2 mb-3">
-                <div class="col-md-6">
-                    <button class="btn w-100 mode-btn active" data-mode="dispatched"
-                        onclick="setDispatchMode('dispatched')">1. 已派遣</button>
-                </div>
-                <div class="col-md-6">
-                    <button class="btn w-100 mode-btn" data-mode="gps" onclick="setDispatchMode('gps')">2. 要定位
-                        (GPS)</button>
-                </div>
-            </div>
-
-            <input type="text" id="charID" class="form-control text-center py-3 fs-5 mb-3" placeholder="輸入 ID 後按 Enter"
-                autocomplete="off" autofocus>
-
-            <div id="dispatch-output" class="result-area d-flex justify-content-center align-items-center p-4 fs-5 mb-2"
-                onclick="copyDispatch()">等待輸入...</div>
-            <div id="dispatch-status" class="status-msg text-center mb-3"></div>
-            <div class="hint-box p-3">• <kbd>Enter</kbd>：複製指令並清空輸入框<br>• <kbd>Tab</kbd>：快速切換「已派遣 / 要定位」</div>
+    <div class="card main-card p-4">
+        <div class="mb-3">
+            <button class="fee-toggle-btn d-inline-flex align-items-center gap-2 px-3 py-1.5 fs-6"
+                onclick="toggleFeePanel()">
+                <span>💰</span> 醫藥費計價器
+            </button>
         </div>
 
-        <div class="tab-pane fade" id="treatment-tab">
-            <div class="row g-3">
-                <div class="col-lg-4">
-                    <div class="sidebar d-flex flex-column p-2">
-                        <input type="text" id="searchBar" class="form-control mb-2" placeholder="🔍 搜尋傷勢... (快捷鍵 F)"
-                            autocomplete="off">
-                        <div class="injury-list d-flex flex-column gap-1" id="injury-container"></div>
+        <h2 class="text-center mb-4">MedLink Dispatch</h2>
+
+        <div id="feePanel" class="fee-panel p-3 mb-4">
+            <div class="d-flex justify-content-between align-items-center mb-3 border-bottom border-secondary pb-2">
+                <h5 class="m-0 text-white fw-bold" style="letter-spacing: 1px;">📊 醫藥費即時結帳系統</h5>
+                <span class="text-muted small">勾選項目自動同步加總明細</span>
+            </div>
+
+            <div class="row g-3 mb-3">
+                <div class="col-md-6">
+                    <div class="fee-card-wrapper h-100">
+                        <div class="fee-section-title">🚑 1. 診察與基本車資 (擇一)</div>
+                        <div class="d-flex flex-column gap-1 mb-3">
+                            <label class="fee-checkbox-label">
+                                <div class="d-flex align-items-center gap-2">
+                                    <input type="radio" name="fee_base_ride" value="150" data-name="院內診察(掛號)"
+                                        onchange="calculateTotalFee()" checked>
+                                    <span class="text-white-50 small">院內診察 (掛號)</span>
+                                </div>
+                                <span class="text-white font-monospace">$150</span>
+                            </label>
+                            <label class="fee-checkbox-label">
+                                <div class="d-flex align-items-center gap-2">
+                                    <input type="radio" name="fee_base_ride" value="250" data-name="院內急救(倒地)"
+                                        onchange="calculateTotalFee()">
+                                    <span class="text-white-50 small">院內急救 (倒地)</span>
+                                </div>
+                                <span class="text-white font-monospace">$250</span>
+                            </label>
+                            <label class="fee-checkbox-label">
+                                <div class="d-flex align-items-center gap-2">
+                                    <input type="radio" name="fee_base_ride" value="350" data-name="救護出勤(市區)"
+                                        onchange="calculateTotalFee()">
+                                    <span class="text-white-50 small">救護出勤 (市區)</span>
+                                </div>
+                                <span class="text-white font-monospace">$350</span>
+                            </label>
+                            <label class="fee-checkbox-label">
+                                <div class="d-flex align-items-center gap-2">
+                                    <input type="radio" name="fee_base_ride" value="450" data-name="救護出勤(中部)"
+                                        onchange="calculateTotalFee()">
+                                    <span class="text-white-50 small">救護出勤 (中部/外環)</span>
+                                </div>
+                                <span class="text-white font-monospace">$450</span>
+                            </label>
+                            <label class="fee-checkbox-label">
+                                <div class="d-flex align-items-center gap-2">
+                                    <input type="radio" name="fee_base_ride" value="550" data-name="救護出勤(北部/山區)"
+                                        onchange="calculateTotalFee()">
+                                    <span class="text-white-50 small">救護出勤 (北部/山區)</span>
+                                </div>
+                                <span class="text-white font-monospace">$550</span>
+                            </label>
+                        </div>
+
+                        <div class="fee-section-title">🌊 2. 特殊搜救加價 (可複選)</div>
+                        <div class="d-flex flex-column gap-1">
+                            <label class="fee-checkbox-label">
+                                <div class="d-flex align-items-center gap-2">
+                                    <input type="checkbox" id="fee_water" value="300" data-name="水中特搜救援"
+                                        onchange="calculateTotalFee()">
+                                    <span class="text-white-50 small">水中特搜救援</span>
+                                </div>
+                                <span class="text-white font-monospace">+$300</span>
+                            </label>
+                            <label class="fee-checkbox-label">
+                                <div class="d-flex align-items-center gap-2">
+                                    <input type="checkbox" id="fee_tunnel" value="200" data-name="地下道/特殊地形搜救"
+                                        onchange="calculateTotalFee()">
+                                    <span class="text-white-50 small">地下道/特殊地形搜救</span>
+                                </div>
+                                <span class="text-white font-monospace">+$200</span>
+                            </label>
+                        </div>
                     </div>
                 </div>
-                <div class="col-lg-8">
-                    <div class="main-panel p-3 d-flex flex-column gap-2" id="step-container"></div>
+
+                <div class="col-md-6">
+                    <div class="fee-card-wrapper d-flex flex-column justify-content-between h-100 gap-2">
+                        <div>
+                            <div class="fee-section-title">🩺 3. 醫療處置與手術費用</div>
+                            <div class="d-flex flex-column gap-1 mb-2">
+                                <label class="fee-checkbox-label">
+                                    <div class="d-flex align-items-center gap-2">
+                                        <input type="checkbox" id="fee_check_cb" data-name="醫療檢查費"
+                                            onchange="calculateTotalFee()">
+                                        <span class="text-white-50 small">醫療檢查費 ($150起)</span>
+                                    </div>
+                                    <div class="d-flex align-items-center gap-1">
+                                        <span class="text-white-50 small font-monospace">$</span>
+                                        <input type="number" id="fee_check_val" value="150" min="150" step="50"
+                                            class="form-control fee-input-style" oninput="calculateTotalFee()">
+                                    </div>
+                                </label>
+                                <label class="fee-checkbox-label">
+                                    <div class="d-flex align-items-center gap-2">
+                                        <input type="checkbox" id="fee_surgery_cb" data-name="手術/縫合費"
+                                            onchange="calculateTotalFee()">
+                                        <span class="text-white-50 small">手術/縫合費 ($500起)</span>
+                                    </div>
+                                    <div class="d-flex align-items-center gap-1">
+                                        <span class="text-white-50 small font-monospace">$</span>
+                                        <input type="number" id="fee_surgery_val" value="500" min="500" max="2000"
+                                            step="50" class="form-control fee-input-style"
+                                            oninput="calculateTotalFee()">
+                                    </div>
+                                </label>
+                            </div>
+
+                            <div class="fee-section-title">🛏️ 4. 常規住院服務</div>
+                            <label class="fee-checkbox-label align-items-center mb-2">
+                                <div class="d-flex align-items-center gap-2">
+                                    <input type="number" id="fee_stay_input" value="0" min="0"
+                                        class="form-control fee-stay-input" oninput="calculateTotalFee()">
+                                    <span class="text-white-50 small">天數 (每晚 $300)</span>
+                                </div>
+                                <span class="text-success small fw-bold font-monospace" id="stay_nights_txt">不開立</span>
+                            </label>
+                        </div>
+
+                        <div class="fee-invoice-preview p-2 flex-grow-1 d-flex flex-column">
+                            <div id="fee-invoice-items" style="overflow-y: auto; font-size: 0.85rem; line-height: 1.4;">
+                            </div>
+                        </div>
+
+                        <div class="row g-2 align-items-center justify-content-center">
+                            <div class="col-12">
+                                <div class="fee-total-box p-2 text-success fw-bold text-center" id="feeTotalDisplay"
+                                    onclick="copyFeeResult()" title="點擊直接複製結帳 /me 指令"
+                                    style="cursor: pointer; font-size: 0.95rem;">
+                                    總計醫藥費：$150 (點擊直接複製金額)
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
-            <div id="treatment-status" class="status-msg text-center mt-3"></div>
-            <div class="hint-box p-3 mt-2">• <kbd>F</kbd>：快速聚焦搜尋框 | <kbd>↑</kbd> <kbd>↓</kbd>：切換傷勢項目 |
-                <kbd>Tab</kbd>：選定該傷勢並切換到步驟<br>• <kbd>Enter</kbd>：自動複製右側紅框步驟，複製完切回遊戲貼上</div>
+            <div id="fee-status" class="status-msg text-center mt-1 small"
+                style="height: 18px; color: #00ffcc; font-weight: bold;"></div>
         </div>
 
-        <div class="tab-pane fade" id="drugs-tab">
-            <div class="row g-3">
-                <div class="col-md-3">
-                    <div class="sidebar d-flex flex-column p-2">
-                        <div class="text-white-50 small fw-bold px-2 py-1 mb-2" style="letter-spacing: 1px;">藥物主要分類
-                        </div>
-                        <div class="category-list d-flex flex-column gap-1" id="drug-cats-container">
-                            <div class="category-item active" data-cat="anes" onclick="switchDrugCat('anes')">🧠 麻醉 / 鎮靜
-                            </div>
-                            <div class="category-item" data-cat="pain" onclick="switchDrugCat('pain')">💧 強效止痛</div>
-                            <div class="category-item" data-cat="cardio" onclick="switchDrugCat('cardio')">🫀 強心 / 升壓
-                            </div>
-                            <div class="category-item" data-cat="fluid" onclick="switchDrugCat('fluid')">🧪 點滴 / 體液
-                            </div>
-                            <div class="category-item" data-cat="other" onclick="switchDrugCat('other')">🩹 其他 / 解毒
-                            </div>
-                        </div>
+        <ul class="nav nav-tabs justify-content-center mb-4" id="mainTabs" role="tablist">
+            <li class="nav-item" role="presentation">
+                <button class="nav-link active" id="tab-dispatch-btn" type="button" role="tab"
+                    aria-controls="dispatch-tab" aria-selected="true" onclick="switchMainTab('dispatch-tab')">311r
+                    調度</button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="tab-treatment-btn" type="button" role="tab" aria-controls="treatment-tab"
+                    aria-selected="false" onclick="switchMainTab('treatment-tab')">醫療 /me 主控台</button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="tab-drugs-btn" type="button" role="tab" aria-controls="drugs-tab"
+                    aria-selected="false" onclick="switchMainTab('drugs-tab')">常用藥物指南</button>
+            </li>
+        </ul>
+
+        <div class="tab-content" id="mainTabsContent">
+            <div class="tab-pane fade show active" id="dispatch-tab" role="tabpanel" aria-labelledby="tab-dispatch-btn">
+                <div class="row g-2 mb-3">
+                    <div class="col-md-6">
+                        <button class="btn w-100 mode-btn active" data-mode="dispatched"
+                            onclick="setDispatchMode('dispatched')">1. 已派遣</button>
+                    </div>
+                    <div class="col-md-6">
+                        <button class="btn w-100 mode-btn" data-mode="gps" onclick="setDispatchMode('gps')">2. 要定位
+                            (GPS)</button>
                     </div>
                 </div>
-                <div class="col-md-9">
-                    <div class="main-panel p-0">
-                        <table class="drug-table">
-                            <thead>
-                                <tr>
-                                    <th style="width: 25%">藥物名稱</th>
-                                    <th style="width: 35%">主要效果/適應症</th>
-                                    <th style="width: 40%">點擊複製處置 (/me)</th>
-                                </tr>
-                            </thead>
-                            <tbody id="drug-table-body"></tbody>
-                        </table>
+
+                <input type="text" id="charID" class="form-control text-center py-3 fs-5 mb-3"
+                    placeholder="輸入 ID 後按 Enter" autocomplete="off" autofocus>
+
+                <div id="dispatch-output"
+                    class="result-area d-flex justify-content-center align-items-center p-4 fs-5 mb-2"
+                    onclick="copyDispatch()">等待輸入...</div>
+                <div id="dispatch-status" class="status-msg text-center mb-3"></div>
+                <div class="hint-box p-3">• <kbd>Enter</kbd>：複製指令並清空輸入框<br>• <kbd>Tab</kbd>：快速切換「已派遣 / 要定位」</div>
+            </div>
+
+            <div class="tab-pane fade" id="treatment-tab" role="tabpanel" aria-labelledby="tab-treatment-btn">
+                <div class="row g-3">
+                    <div class="col-lg-4">
+                        <div class="sidebar d-flex flex-column p-2">
+                            <input type="text" id="searchBar" class="form-control mb-2" placeholder="🔍 搜尋傷勢... (快捷鍵 F)"
+                                autocomplete="off">
+                            <div class="injury-list d-flex flex-column gap-1" id="injury-container"></div>
+                        </div>
                     </div>
+                    <div class="col-lg-8">
+                        <div class="main-panel p-3 d-flex flex-column gap-2" id="step-container"></div>
+                    </div>
+                </div>
+                <div id="treatment-status" class="status-msg text-center mt-3"></div>
+                <div class="hint-box p-3 mt-2">• <kbd>F</kbd>：快速聚焦搜尋框 | <kbd>↑</kbd> <kbd>↓</kbd>：切換傷勢項目 |
+                    <kbd>Tab</kbd>：選定該傷勢並切換到步驟<br>• <kbd>Enter</kbd>：自動複製右側紅框步驟，複製完切回遊戲貼上
                 </div>
             </div>
-            <div id="drugs-status" class="status-msg text-center mt-3"></div>
-            <div class="hint-box p-3 mt-2">
-                <span style="color: var(--primary); font-weight: bold; margin-right: 5px;">⚡ SYSTEM HINT:</span>
-                先在左側點選 <kbd>藥物大類</kbd>，再到右側表格中 <kbd>直接點擊整列藥物</kbd>，即可快速複製對應的 <code>/me</code> 遊戲指令。
+
+            <div class="tab-pane fade" id="drugs-tab" role="tabpanel" aria-labelledby="tab-drugs-btn">
+                <div class="row g-3">
+                    <div class="col-md-3">
+                        <div class="sidebar d-flex flex-column p-2">
+                            <div class="text-white-50 small fw-bold px-2 py-1 mb-2" style="letter-spacing: 1px;">藥物主要分類
+                            </div>
+                            <div class="category-list d-flex flex-column gap-1" id="drug-cats-container">
+                                <div class="category-item active" data-cat="anes" onclick="switchDrugCat('anes')">🧠 麻醉
+                                    / 鎮靜
+                                </div>
+                                <div class="category-item" data-cat="pain" onclick="switchDrugCat('pain')">💧 強效止痛</div>
+                                <div class="category-item" data-cat="cardio" onclick="switchDrugCat('cardio')">🫀 強心 /
+                                    升壓
+                                </div>
+                                <div class="category-item" data-cat="fluid" onclick="switchDrugCat('fluid')">🧪 點滴 / 體液
+                                </div>
+                                <div class="category-item" data-cat="other" onclick="switchDrugCat('other')">🩹 其他 / 解毒
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-9">
+                        <div class="main-panel p-0">
+                            <table class="drug-table">
+                                <thead>
+                                    <tr>
+                                        <th style="width: 25%">藥物名稱</th>
+                                        <th style="width: 35%">主要效果/適應症</th>
+                                        <th style="width: 40%">點擊複製處置 (/me)</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="drug-table-body"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                <div id="drugs-status" class="status-msg text-center mt-3"></div>
+                <div class="hint-box p-3 mt-2">
+                    <span style="color: var(--primary); font-weight: bold; margin-right: 5px;">⚡ SYSTEM HINT:</span>
+                    先在左側點選 <kbd>藥物大類</kbd>，再到右側表格中 <kbd>直接點擊整列藥物</kbd>，即可快速複製對應的 <code>/me</code> 遊戲指令。
+                </div>
             </div>
         </div>
     </div>
-</div>
 
-<footer class="custom-footer">
-    <div class="footer-warning">【免責聲明】本站所載之醫學術語、處置與手術流程均為虛擬 RP 娛樂用途，不具備任何現實醫療指導價值。</div>
-    <div>&copy; 2026 暈船仔丨小翔丨. All rights reserved.</div>
-</footer>
+    <footer class="custom-footer">
+        <div class="footer-warning">【免責聲明】本站所載之醫學術語、處置與手術流程均為虛擬 RP 娛樂用途，不具備任何現實醫療指導價值。</div>
+        <div>&copy; 2026 暈船仔丨小翔丨. All rights reserved.</div>
+    </footer>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 
@@ -529,7 +805,6 @@
         // 資料庫中心
         // ==========================================
         const treatmentMessages = {
-
             "abrasion": {
                 name: "大面積擦挫傷處置",
                 steps: [
@@ -563,7 +838,7 @@
                     "/me 執行氣管內插管並連接呼吸器",
                     "/me 使用優碘進行大範圍術區消毒並鋪單",
                     "/me 使用手術刀沿彈孔向外延伸切開皮膚",
-                    "/me 使用撐開器顯露深部肌肉與彈道視野",
+                    "/me 使用撐開器顯錄深部肌肉與彈道視野",
                     "/me 使用吸引器清除彈道內積血與組織碎屑",
                     "/me 利用移動式X光機(C-Arm)定位子彈深度",
                     "/me 使用血管鉗順著彈道夾住子彈",
@@ -584,7 +859,7 @@
                     "/me 使用低溫生理食鹽水持續沖洗",
                     "---- 院內常規處置 ----",
                     "/me 使用無菌生理食鹽水溫和清潔燙傷區域",
-                    "/me 對完整未破裂的水泡進行消毒並保留表皮",
+                    "/me 对完整未破裂的水泡進行消毒並保留表皮",
                     "/me 使用無菌針頭對過大水泡進行低位引流排空組織液",
                     "/me 於患部均勻塗抹一層石蠟燙傷膏",
                     "/me 使用無菌疏鬆紗布覆蓋並以網狀繃帶輕柔固定",
@@ -601,7 +876,6 @@
                     "/me 覆蓋無菌疏鬆紗布並以彈性繃帶纏繞固定"
                 ]
             },
-
             "fracture_surgery": {
                 name: "骨折固定與復位手術",
                 steps: [
@@ -703,218 +977,380 @@
                     "/me 使用外科縫線關閉腹壁皮膚傷口",
                     "/me 敷設無菌敷料並妥善黏貼固定"
                 ]
-            },
+            }
         };
-        // ==========================================
-        // 常用藥物資料庫
-        // ==========================================
-    const drugList = [
-        // === 原有藥物 (保留) ===
-        { name: "Propofol (異丙酚)", type: "anes", effect: "迅速誘導全身麻醉、維持昏迷狀態", me: "/me 經由靜脈留置針注射 Propofol 進行全身麻醉" },
-        { name: "Lidocaine (利多卡因)", type: "anes", effect: "局部切口、彈道或挫傷周圍阻斷止痛", me: "/me 於患部術區周圍皮下注射 Lidocaine 進行局部浸潤麻醉" },
-        { name: "Midazolam (咪達唑崙)", type: "anes", effect: "強力鎮靜、消除術前焦慮、抗驚厥", me: "/me 經靜脈注射 Midazolam 進行強效鎮靜處置" },
-        { name: "Morphine (嗎啡)", type: "pain", effect: "緩解骨折、嚴重創傷、大出血之劇烈疼痛", me: "/me 經由靜脈通路緩慢推注 Morphine 5mg 以緩解重度創傷痛楚" },
-        { name: "Fentanyl (芬太尼)", type: "pain", effect: "阿片類強效麻醉性止痛藥，作用極快", me: "/me 經由靜脈推注 Fentanyl 以進行術前重度止痛" },
-        { name: "Acetaminophen (普拿疼)", type: "pain", effect: "中輕度創傷止痛、發燒退燒常規處置", me: "/me 經靜脈滴注 Acetaminophen 點滴緩解患者中度疼痛" },
-        { name: "Epinephrine (腎上腺素)", type: "cardio", effect: "心跳驟停搶救、過敏性休克、極度低血壓", me: "/me 經靜脈快速推注 Epinephrine 1mg 並配合 CPR 心肺復甦" },
-        { name: "Norepinephrine (去甲腎上腺素)", type: "cardio", effect: "失血性休克、手術大出血維持核心收縮壓", me: "/me 建立靜脈幫浦持續輸注 Norepinephrine 以維持核心血壓" },
-        { name: "Amiodarone (胺碘酮)", type: "cardio", effect: "心室顫動 (VF) 或無脈性心室頻脈搶救", me: "/me 經靜脈注射 Amiodarone 300mg 嘗試矯正惡性心律不整" },
-        { name: "Atropine (阿托品)", type: "cardio", effect: "心跳過慢、副交感神經抑制、有機磷中毒解毒", me: "/me 靜脈注射 Atropine 1mg 以快速提升過緩的心跳速率" },
-        { name: "Normal Saline (生理食鹽水)", type: "fluid", effect: "常規靜脈補液、創口沖洗、稀釋藥物", me: "/me 建立靜脈通路並全速輸注 0.9% Normal Saline 補充基本體液" },
-        { name: "Whole Blood (全血)", type: "fluid", effect: "重大創傷失血休克、開胸開腹大量補血", me: "/me 啟動大量輸血協定，經由導管快速加壓輸注袋裝全血" },
-        { name: "Lactated Ringer's (乳酸林格氏液)", type: "fluid", effect: "電解質補充、嚴重燒燙傷失水、手術點滴", me: "/me 靜脈掛載乳酸林格氏液點滴，調節患者體內電解質平衡" },
-        { name: "D50 (高濃度葡萄糖)", type: "other", effect: "嚴重低血糖、血糖過低昏迷一線搶救", me: "/me 經靜脈通路緩慢推注高濃度葡萄糖溶液 D50 40ml 進行搶救" },
-        { name: "Tranexamic Acid (傳明酸)", type: "other", effect: "促進止血、減少內出血與術中滲血", me: "/me 經由靜脈滴注 Tranexamic Acid 1g 以抑制纖維蛋白溶解止血" },
-        { name: "Naloxone (納洛酮)", type: "other", effect: "鴉片類/毒品/嗎啡藥物過量中毒解毒", me: "/me 經靜脈注射 Naloxone 以逆轉藥物過量引起之呼吸抑制" },
 
-        // === 🆕 新增藥物：麻醉 / 鎮靜 (anes) ===
-        { name: "Succinylcholine (司可林)", type: "anes", effect: "強力肌肉鬆弛劑、用於氣管插管前置作業", me: "/me 靜脈注射 Succinylcholine 誘導骨骼肌鬆弛以利氣管內插管" },
-        { name: "Ketamine (K他命/氯胺酮)", type: "anes", effect: "分離性麻醉、具備止痛效果、氣喘患者麻醉首選", me: "/me 經由靜脈緩慢推注 Ketamine 誘導分離性麻醉並維持呼吸道順暢" },
-        { name: "Diazepam (安定/地西泮)", type: "anes", effect: "控制癲癇重積狀態、緩解嚴重肌肉痙攣", me: "/me 經靜脈緩慢注射 Diazepam 以抑制大腦異常放電並終止癲癇抽搐" },
+        const drugList = [
+            { name: "Propofol (異丙酚)", type: "anes", effect: "迅速誘導全身麻醉、維持昏迷狀態", me: "/me 經由靜脈留置針注射 Propofol 進行全身麻醉" },
+            { name: "Lidocaine (利多卡因)", type: "anes", effect: "局部切口、彈道或挫傷周圍阻斷止痛", me: "/me 於患部術區周圍皮下注射 Lidocaine 進行局部浸潤麻醉" },
+            { name: "Midazolam (咪達唑崙)", type: "anes", effect: "強力鎮靜、消除術前焦慮、抗驚厥", me: "/me 經靜脈注射 Midazolam 進行強效鎮靜處置" },
+            { name: "Morphine (嗎啡)", type: "pain", effect: "緩解骨折、嚴重創傷、大出血之劇烈疼痛", me: "/me 經由靜脈通路緩慢推注 Morphine 5mg 以緩解重度創傷痛楚" },
+            { name: "Fentanyl (芬太尼)", type: "pain", effect: "阿片類強效麻醉性止痛藥，作用極快", me: "/me 經由靜脈推注 Fentanyl 以進行術前重度止痛" },
+            { name: "Acetaminophen (普拿疼)", type: "pain", effect: "中輕度創傷止痛、發燒退燒常規處置", me: "/me 經靜脈滴注 Acetaminophen 點滴緩解患者中度疼痛" },
+            { name: "Epinephrine (腎上腺素)", type: "cardio", effect: "心跳驟停搶救、過敏性休克、極度低血壓", me: "/me 經靜脈快速推注 Epinephrine 1mg 並配合 CPR 心肺復甦" },
+            { name: "Norepinephrine (去甲腎上腺素)", type: "cardio", effect: "失血性休克、手術大出血維持核心收縮壓", me: "/me 建立靜脈幫浦持續輸注 Norepinephrine 以維持核心血壓" },
+            { name: "Amiodarone (胺碘酮)", type: "cardio", effect: "心室顫動 (VF) 或無脈性心室頻脈搶救", me: "/me 經靜脈注射 Amiodarone 300mg 嘗試矯正惡性心律不整" },
+            { name: "Atropine (阿托品)", type: "cardio", effect: "心跳過慢、副交感神經抑制、有機磷中毒解毒", me: "/me 靜脈注射 Atropine 1mg 以快速提升過緩的心跳速率" },
+            { name: "Normal Saline (生理食鹽水)", type: "fluid", effect: "常規靜脈補液、創口沖洗、稀釋藥物", me: "/me 建立靜脈通路並全速輸注 0.9% Normal Saline 補充基本體液" },
+            { name: "Whole Blood (全血)", type: "fluid", effect: "重大創傷失血休克、開胸開腹大量補血", me: "/me 啟動大量輸血協定，經由導管快速加壓輸注袋裝全血" },
+            { name: "Lactated Ringer's (乳酸林格氏液)", type: "fluid", effect: "電解質補充、嚴重燒燙傷失水、手術點滴", me: "/me 靜脈掛載乳酸林格氏液點滴，調節患者體內電解質平衡" },
+            { name: "D50 (高濃度葡萄糖)", type: "other", effect: "嚴重低血糖、血糖過低昏迷一線搶救", me: "/me 經靜脈通路緩慢推注高濃度葡萄糖溶液 D50 40ml 進行搶救" },
+            { name: "Tranexamic Acid (傳明酸)", type: "other", effect: "促進止血、減少內出血與術中滲血", me: "/me 經由靜脈滴注 Tranexamic Acid 1g 以抑制纖維蛋白溶解止血" },
+            { name: "Naloxone (納洛酮)", type: "other", effect: "鴉片類/毒品/嗎啡藥物過量中毒解毒", me: "/me 經靜脈注射 Naloxone 以逆轉藥物過量引起之呼吸抑制" },
+            { name: "Succinylcholine (司可林)", type: "anes", effect: "強力肌肉鬆弛劑、用於氣管插管前置作業", me: "/me 靜脈注射 Succinylcholine 誘導骨骼肌鬆弛以利氣管內插管" },
+            { name: "Ketamine (K他命/氯胺酮)", type: "anes", effect: "分離性麻醉、具備止痛效果、氣喘患者麻醉首選", me: "/me 經由靜脈緩慢推注 Ketamine 誘導分離性麻醉並維持呼吸道順暢" },
+            { name: "Diazepam (安定/地西泮)", type: "anes", effect: "控制癲癇重積狀態、緩解嚴重肌肉痙攣", me: "/me 經靜脈緩慢注射 Diazepam 以抑制大腦異常放電並終止癲癇抽搐" },
+            { name: "Ketorolac (克多炎)", type: "pain", effect: "非類固醇強力消炎止痛藥、非管制麻醉藥", me: "/me 肌肉注射 Ketorolac 30mg 以緩解中重度急性肌肉骨骼疼痛" },
+            { name: "Dopamine (多巴胺)", type: "cardio", effect: "提升心收縮力、治療心因性休克與低血壓", me: "/me 設定靜脈幫浦微量輸注 Dopamine 以增加心輸出量並穩定血壓" },
+            { name: "Adenosine (腺苷)", type: "cardio", effect: "陣發性上心室頻脈 (PSVT) 迅速降心速、重置心律", me: "/me 經由近心端靜脈彈丸式快速推注 Adenosine 6mg 並立即沖洗生理食鹽水" },
+            { name: "Nitroglycerin (硝酸甘油)", type: "cardio", effect: "擴張冠狀動脈、緩解急性心肌梗塞與心絞痛", me: "/me 给予患者舌下含服 Nitroglycerin (NTG) 一錠以擴張血管、減輕心臟負荷" },
+            { name: "Mannitol (甘露醇)", type: "fluid", effect: "高滲透壓利尿劑、降腦壓、搶救嚴重腦腫脹與顱內壓過高", me: "/me 快速靜脈滴注 20% Mannitol 高滲透壓溶液以降低顱內壓" },
+            { name: "Sodium Bicarbonate (碳酸氫鈉)", type: "fluid", effect: "矯正嚴重代謝性酸中毒、長時間壓車 or 長時間 CPR 後使用", me: "/me 經靜脈通路給予 Sodium Bicarbonate 以矯正體內重度酸中毒" },
+            { name: "Dexamethasone (地塞米松)", type: "other", effect: "強力類固醇、抗過敏、減輕腦水腫與嚴重氣喘發作", me: "/me 經靜脈注射高劑量 Dexamethasone 類固醇以抑制全身性發炎反應" },
+            { name: "Diphenhydramine (苯海拉明)", type: "other", effect: "抗組織胺、治療嚴重過敏反應與蕁麻疹", me: "/me 肌肉注射 Diphenhydramine 針劑以迅速緩解過敏性免疫反應" },
+            { name: "Activated Charcoal (活性碳)", type: "other", effect: "口服毒物、藥物過量之腸胃道吸附洗胃處置", me: "/me 經由胃管向胃內灌注活性碳懸浮液以吸附殘留毒物" },
+            { name: "Calcium Gluconate (葡萄糖酸鈣)", type: "other", effect: "解高血鉀毒性、保護心臟、解硫酸鎂中毒", me: "/me 經靜脈緩慢推注 Calcium Gluconate 以穩定心肌細胞膜電位" },
+            { name: "Sterile Water (無菌沖洗水)", type: "other", effect: "催淚瓦斯、化學品、強酸強鹼皮膚與眼部洗消", me: "/me 使用大量 Sterile Water 無菌水持續沖洗患者受污染的皮膚與眼部" }
+        ];
 
-        // === 🆕 新增藥物：強效止痛 (pain) ===
-        { name: "Ketorolac (克多炎)", type: "pain", effect: "非類固醇強力消炎止痛藥、非管制麻醉藥", me: "/me 肌肉注射 Ketorolac 30mg 以緩解中重度急性肌肉骨骼疼痛" },
+        let currentInjuryKey = 'fracture_surgery';
+        let currentStepIndex = 0;
+        let filteredKeys = Object.keys(treatmentMessages);
+        let currentDrugCat = 'anes';
 
-        // === 🆕 新增藥物：強心 / 升壓 / 心血管 (cardio) ===
-        { name: "Dopamine (多巴胺)", type: "cardio", effect: "提升心收縮力、治療心因性休克與低血壓", me: "/me 設定靜脈幫浦微量輸注 Dopamine 以增加心輸出量並穩定血壓" },
-        { name: "Adenosine (腺苷)", type: "cardio", effect: "陣發性上心室頻脈 (PSVT) 迅速降心速、重置心律", me: "/me 經由近心端靜脈彈丸式快速推注 Adenosine 6mg 並立即沖洗生理食鹽水" },
-        { name: "Nitroglycerin (硝酸甘油)", type: "cardio", effect: "擴張冠狀動脈、緩解急性心肌梗塞與心絞痛", me: "/me 給予患者舌下含服 Nitroglycerin (NTG) 一錠以擴張血管、減輕心臟負荷" },
+        const input = document.getElementById('charID');
+        const dispatchOutput = document.getElementById('dispatch-output');
+        const dispatchStatus = document.getElementById('dispatch-status');
+        let currentDispatchMode = 'dispatched';
+        const dispatchMessages = { dispatched: "醫護已派遣，請耐心等候", gps: "請按壓/311p按鈕，發送GPS定位，以利醫護同仁搜救作業" };
 
-        // === 🆕 新增藥物：點滴 / 體液 (fluid) ===
-        { name: "Mannitol (甘露醇)", type: "fluid", effect: "高滲透壓利尿劑、降腦壓、搶救嚴重腦腫脹與顱內壓過高", me: "/me 快速靜脈滴注 20% Mannitol 高滲透壓溶液以降低顱內壓" },
-        { name: "Sodium Bicarbonate (碳酸氫鈉)", type: "fluid", effect: "矯正嚴重代謝性酸中毒、長時間壓車或長時間 CPR 後使用", me: "/me 經靜脈通路給予 Sodium Bicarbonate 以矯正體內重度酸中毒" },
+        // ✨ ✨ ✨ 【核心修復】補回基礎文字複製函數 ✨ ✨ ✨
+        function copyText(text, statusElement) {
+            navigator.clipboard.writeText(text).then(() => {
+                if (statusElement) {
+                    statusElement.innerText = `✅ 已成功複製：${text.substring(0, 15)}...`;
+                    setTimeout(() => statusElement.innerText = '', 2000);
+                }
+            }).catch(err => {
+                if (statusElement) statusElement.innerText = `❌ 複製失敗，請手動複製`;
+            });
+        }
 
-        // === 🆕 新增藥物：其他 / 解毒 / 特殊處置 (other) ===
-        { name: "Dexamethasone (地塞米松)", type: "other", effect: "強力類固醇、抗過敏、減輕腦水腫與嚴重氣喘發作", me: "/me 經靜脈注射高劑量 Dexamethasone 類固醇以抑制全身性發炎反應" },
-        { name: "Diphenhydramine (苯海拉明)", type: "other", effect: "抗組織胺、治療嚴重過敏反應與蕁麻疹", me: "/me 肌肉注射 Diphenhydramine 針劑以迅速緩解過敏性免疫反應" },
-        { name: "Activated Charcoal (活性碳)", type: "other", effect: "口服毒物、藥物過量之腸胃道吸附洗胃處置", me: "/me 經由胃管向胃內灌注活性碳懸浮液以吸附殘留毒物" },
-        { name: "Calcium Gluconate (葡萄糖酸鈣)", type: "other", effect: "解高血鉀毒性、保護心臟、解硫酸鎂中毒", me: "/me 經靜脈緩慢推注 Calcium Gluconate 以穩定心肌細胞膜電位" },
-        { name: "Sterile Water (無菌沖洗水)", type: "other", effect: "催淚瓦斯、化學品、強酸強鹼皮膚與眼部洗消", me: "/me 使用大量 Sterile Water 無菌水持續沖洗患者受污染的皮膚與眼部" }
-    ];
+        function setDispatchMode(mode) {
+            currentDispatchMode = mode;
+            document.querySelectorAll('.mode-btn').forEach(btn => btn.classList.toggle('active', btn.dataset.mode === mode));
+            dispatchOutput.style.color = mode === 'dispatched' ? '#00ffcc' : '#ffcc00';
+            updateDispatchOutput();
+        }
+        function updateDispatchOutput() {
+            const val = input.value.trim();
+            dispatchOutput.innerText = val ? `/311r ${val} ${dispatchMessages[currentDispatchMode]}` : '等待輸入...';
+        }
+        input.addEventListener('input', updateDispatchOutput);
 
-    let currentInjuryKey = 'fracture_surgery';
-    let currentStepIndex = 0;
-    let filteredKeys = Object.keys(treatmentMessages);
-    let currentDrugCat = 'anes';
+        const searchBar = document.getElementById('searchBar');
+        const injuryContainer = document.getElementById('injury-container');
+        const stepContainer = document.getElementById('step-container');
+        const treatmentStatus = document.getElementById('treatment-status');
 
-    // Dispatch Tab Logic
-    const input = document.getElementById('charID');
-    const dispatchOutput = document.getElementById('dispatch-output');
-    const dispatchStatus = document.getElementById('dispatch-status');
-    let currentDispatchMode = 'dispatched';
-    const dispatchMessages = { dispatched: "醫護已派遣，請耐心等候", gps: "請按壓/311p按鈕，發送GPS定位，以利醫護同仁搜救作業" };
-
-    function setDispatchMode(mode) {
-        currentDispatchMode = mode;
-        document.querySelectorAll('.mode-btn').forEach(btn => btn.classList.toggle('active', btn.dataset.mode === mode));
-        dispatchOutput.style.color = mode === 'dispatched' ? '#00ffcc' : '#ffcc00';
-        updateDispatchOutput();
-    }
-    function updateDispatchOutput() {
-        const val = input.value.trim();
-        dispatchOutput.innerText = val ? `/311r ${val} ${dispatchMessages[currentDispatchMode]}` : '等待輸入...';
-    }
-    input.addEventListener('input', updateDispatchOutput);
-
-    // Treatment Tab Logic
-    const searchBar = document.getElementById('searchBar');
-    const injuryContainer = document.getElementById('injury-container');
-    const stepContainer = document.getElementById('step-container');
-    const treatmentStatus = document.getElementById('treatment-status');
-
-    function initMedicalTab() {
-        renderInjuryList();
-        checkAndSkipDivider();
-        renderSteps();
-        renderDrugTable();
-    }
-    function checkAndSkipDivider() {
-        const steps = treatmentMessages[currentInjuryKey]?.steps || [];
-        if (steps[currentStepIndex] && steps[currentStepIndex].startsWith('----')) currentStepIndex++;
-    }
-    searchBar.addEventListener('input', () => {
-        const query = searchBar.value.toLowerCase().trim();
-        filteredKeys = Object.keys(treatmentMessages).filter(key => treatmentMessages[key].name.toLowerCase().includes(query) || key.includes(query));
-        renderInjuryList();
-        if (filteredKeys.length > 0 && !filteredKeys.includes(currentInjuryKey)) selectInjury(filteredKeys[0]);
-    });
-    function renderInjuryList() {
-        injuryContainer.innerHTML = '';
-        filteredKeys.forEach(key => {
-            const div = document.createElement('div');
-            div.className = `injury-item ${key === currentInjuryKey ? 'active' : ''}`;
-            div.innerText = treatmentMessages[key].name;
-            div.onclick = () => selectInjury(key);
-            injuryContainer.appendChild(div);
+        // 初始化主控台
+        function initMedicalTab() {
+            renderInjuryList();
+            checkAndSkipDivider();
+            renderSteps();
+            renderDrugTable();
+            calculateTotalFee(); // 初始化計價面板數據
+        }
+        function checkAndSkipDivider() {
+            const steps = treatmentMessages[currentInjuryKey]?.steps || [];
+            if (steps[currentStepIndex] && steps[currentStepIndex].startsWith('----')) currentStepIndex++;
+        }
+        searchBar.addEventListener('input', () => {
+            const query = searchBar.value.toLowerCase().trim();
+            filteredKeys = Object.keys(treatmentMessages).filter(key => treatmentMessages[key].name.toLowerCase().includes(query) || key.includes(query));
+            renderInjuryList();
+            if (filteredKeys.length > 0 && !filteredKeys.includes(currentInjuryKey)) selectInjury(filteredKeys[0]);
         });
-    }
-    function selectInjury(key) {
-        currentInjuryKey = key;
-        currentStepIndex = 0;
-        renderInjuryList();
-        checkAndSkipDivider();
-        renderSteps();
-    }
-    function renderSteps() {
-        stepContainer.innerHTML = '';
-        const data = treatmentMessages[currentInjuryKey];
-        if (!data) return;
-        data.steps.forEach((text, index) => {
-            const div = document.createElement('div');
-            if (text.startsWith('----')) {
-                div.className = 'section-divider';
-                div.innerText = text.replace(/^-+\s*|\s*-+$/g, '');
-                stepContainer.appendChild(div);
-                return;
-            }
-            div.className = 'step-item';
-            if (index === currentStepIndex) div.classList.add('next-up');
-            if (index < currentStepIndex) div.classList.add('copied');
-            div.innerHTML = `<div class="d-flex justify-content-between align-items-center"><span>${text}</span><span class="copy-badge">${index === currentStepIndex ? 'ENTER 複製' : (index < currentStepIndex ? '已複製' : '點擊複製')}</span></div>`;
-            div.onclick = () => {
-                copyText(text, treatmentStatus);
-                currentStepIndex = index + 1;
-                checkAndSkipDivider();
-                renderSteps();
-            };
-            stepContainer.appendChild(div);
-        });
-    }
-
-    // 藥物 Tab 渲染與邏輯
-    const drugTableBody = document.getElementById('drug-table-body');
-    const drugsStatus = document.getElementById('drugs-status');
-
-    function switchDrugCat(cat) {
-        currentDrugCat = cat;
-        document.querySelectorAll('#drug-cats-container .category-item').forEach(item => item.classList.toggle('active', item.dataset.cat === cat));
-        renderDrugTable();
-    }
-
-    function renderDrugTable() {
-        drugTableBody.innerHTML = '';
-        const targetDrugs = drugList.filter(d => d.type === currentDrugCat);
-
-        targetDrugs.forEach(drug => {
-            const tr = document.createElement('tr');
-            tr.className = 'drug-row';
-            // 🛠️ 修正重點：不再使用阻礙視線的 text-muted，直接給它獨立且明亮的 .drug-effect-highlight
-            tr.innerHTML = `
-                    <td class="fw-bold text-white">${drug.name}</td>
-                    <td class="drug-effect-highlight">${drug.effect}</td>
-                    <td><div class="table-drug-me" title="${drug.me}">${drug.me}</div></td>
-                `;
-            tr.onclick = () => copyText(drug.me, drugsStatus);
-            drugTableBody.appendChild(tr);
-        });
-    }
-
-    function copyText(text, statusElement) {
-        navigator.clipboard.writeText(text).then(() => {
-            statusElement.innerText = `✅ 已複製指令: "${text}"`;
-            setTimeout(() => statusElement.innerText = '', 2000);
-        });
-    }
-
-    // 快捷鍵邏輯
-    document.addEventListener('keydown', (e) => {
-        const isDispatchActive = document.getElementById('dispatch-tab').classList.contains('active');
-        const isTreatmentActive = document.getElementById('treatment-tab').classList.contains('active');
-
-        if (isDispatchActive) {
-            if (e.key === 'Tab') { e.preventDefault(); setDispatchMode(currentDispatchMode === 'dispatched' ? 'gps' : 'dispatched'); }
-            if (e.key === 'Enter' && input.value.trim() !== "") { copyDispatch(); input.value = ''; updateDispatchOutput(); }
-        } else if (isTreatmentActive) {
-            if (e.key.toLowerCase() === 'f' && document.activeElement !== searchBar) { e.preventDefault(); searchBar.focus(); searchBar.select(); }
-            if (document.activeElement === searchBar) {
-                let currentIndex = filteredKeys.indexOf(currentInjuryKey);
-                if (e.key === 'ArrowDown') { e.preventDefault(); selectInjury(filteredKeys[(currentIndex + 1) % filteredKeys.length]); }
-                if (e.key === 'ArrowUp') { e.preventDefault(); selectInjury(filteredKeys[(currentIndex - 1 + filteredKeys.length) % filteredKeys.length]); }
-                if (e.key === 'Tab' || e.key === 'Enter') { e.preventDefault(); searchBar.blur(); }
-                return;
-            }
-            if (e.key === 'Enter') {
-                const steps = treatmentMessages[currentInjuryKey].steps;
-                if (currentStepIndex < steps.length) {
-                    copyText(steps[currentStepIndex], treatmentStatus);
-                    currentStepIndex++;
+        function renderInjuryList() {
+            injuryContainer.innerHTML = '';
+            filteredKeys.forEach(key => {
+                const div = document.createElement('div');
+                div.className = `injury-item ${key === currentInjuryKey ? 'active' : ''}`;
+                div.innerText = treatmentMessages[key].name;
+                div.onclick = () => selectInjury(key);
+                injuryContainer.appendChild(div);
+            });
+        }
+        function selectInjury(key) {
+            currentInjuryKey = key;
+            currentStepIndex = 0;
+            renderInjuryList();
+            checkAndSkipDivider();
+            renderSteps();
+        }
+        function renderSteps() {
+            stepContainer.innerHTML = '';
+            const data = treatmentMessages[currentInjuryKey];
+            if (!data) return;
+            data.steps.forEach((text, index) => {
+                const div = document.createElement('div');
+                if (text.startsWith('----')) {
+                    div.className = 'section-divider';
+                    div.innerText = text.replace(/^-+\s*|\s*-+$/g, '');
+                    stepContainer.appendChild(div);
+                    return;
+                }
+                div.className = 'step-item';
+                if (index === currentStepIndex) div.classList.add('next-up');
+                if (index < currentStepIndex) div.classList.add('copied');
+                div.innerHTML = `<div class="d-flex justify-content-between align-items-center"><span>${text}</span><span class="copy-badge">${index === currentStepIndex ? 'ENTER 複製' : (index < currentStepIndex ? '已複製' : '點擊複製')}</span></div>`;
+                div.onclick = () => {
+                    copyText(text, treatmentStatus);
+                    currentStepIndex = index + 1;
                     checkAndSkipDivider();
                     renderSteps();
-                } else {
-                    treatmentStatus.innerText = '✨ 本輪處置已全部完成！按 F 搜尋下一單。';
-                }
+                };
+                stepContainer.appendChild(div);
+            });
+        }
+
+        const drugTableBody = document.getElementById('drug-table-body');
+        const drugsStatus = document.getElementById('drugs-status');
+
+        function switchDrugCat(cat) {
+            currentDrugCat = cat;
+            document.querySelectorAll('#drug-cats-container .category-item').forEach(item => item.classList.toggle('active', item.dataset.cat === cat));
+            renderDrugTable();
+        }
+
+        function renderDrugTable() {
+            if (!drugTableBody) return; // 安全檢查
+            drugTableBody.innerHTML = '';
+            const targetDrugs = drugList.filter(d => d.type === currentDrugCat);
+
+            targetDrugs.forEach(drug => {
+                const tr = document.createElement('tr');
+                tr.className = 'drug-row';
+                tr.innerHTML = `
+                            <td class="fw-bold text-white">${drug.name}</td>
+                            <td class="drug-effect-highlight">${drug.effect}</td>
+                            <td><div class="table-drug-me" title="${drug.me}">${drug.me}</div></td>
+                        `;
+                tr.onclick = () => copyText(drug.me, drugsStatus);
+                drugTableBody.appendChild(tr);
+            });
+        }
+
+        // ==========================================
+        // 💰 醫藥費功能中心 (排版優化 + 邊框動態反饋)
+        // ==========================================
+        const feePanel = document.getElementById('feePanel');
+        const feeTotalDisplay = document.getElementById('feeTotalDisplay');
+        const feeStatus = document.getElementById('fee-status');
+
+        // 醫藥費面板 展開/收合切換
+        function toggleFeePanel() {
+            const panel = document.getElementById('feePanel');
+            if (panel.style.display === 'none' || panel.style.display === '') {
+                panel.style.display = 'block';
+                calculateTotalFee(); // 展開時自動跑一次初始計算
+            } else {
+                panel.style.display = 'none';
             }
         }
-    });
 
-    function copyDispatch() {
-        const text = dispatchOutput.innerText;
-        if (text === '等待輸入...') return;
-        navigator.clipboard.writeText(text).then(() => {
-            dispatchStatus.innerText = '✅ 已複製調度指令！';
-            setTimeout(() => dispatchStatus.innerText = '', 2000);
+        // 醫藥費即時動態加總與明細預覽邏輯
+        let currentTotalFeeGlobal = 150;
+
+        function calculateTotalFee() {
+            let total = 0;
+            let itemsHtml = "<div class='text-white border-bottom border-secondary pb-1 mb-1 fw-bold'>🧾 MedLink 費用動態清單</div>";
+
+            // 1. 診察與基本車資 (Radio單選)
+            const activeRadio = document.querySelector('input[name="fee_base_ride"]:checked');
+            if (activeRadio) {
+                let basePrice = parseInt(activeRadio.value);
+                let baseName = activeRadio.getAttribute('data-name');
+                total += basePrice;
+                itemsHtml += `<div class='d-flex justify-content-between text-white-50'><span>• ${baseName}</span><span>$${basePrice}</span></div>`;
+            }
+
+            // 2. 特殊搜救加價 (Checkbox多選)
+            const waterCb = document.getElementById('fee_water');
+            if (waterCb && waterCb.checked) {
+                let val = parseInt(waterCb.value);
+                total += val;
+                itemsHtml += `<div class='d-flex justify-content-between text-white-50'><span>• 水中特搜救援</span><span>+$${val}</span></div>`;
+            }
+            const tunnelCb = document.getElementById('fee_tunnel');
+            if (tunnelCb && tunnelCb.checked) {
+                let val = parseInt(tunnelCb.value);
+                total += val;
+                itemsHtml += `<div class='d-flex justify-content-between text-white-50'><span>• 地形/地下道特搜</span><span>+$${val}</span></div>`;
+            }
+
+            // 3. 醫療處置與手術 (需勾選對應 Checkbox 才計入輸入框數值)
+            const checkCb = document.getElementById('fee_check_cb');
+            const checkValInput = document.getElementById('fee_check_val');
+            if (checkCb && checkCb.checked) {
+                let val = parseInt(checkValInput.value) || 0;
+                total += val;
+                itemsHtml += `<div class='d-flex justify-content-between text-white-50'><span>• 醫療檢查費用</span><span>$${val}</span></div>`;
+            }
+
+            const surgeryCb = document.getElementById('fee_surgery_cb');
+            const surgeryValInput = document.getElementById('fee_surgery_val');
+            if (surgeryCb && surgeryCb.checked) {
+                let val = parseInt(surgeryValInput.value) || 0;
+                total += val;
+                itemsHtml += `<div class='d-flex justify-content-between text-white-50'><span>• 手術/縫合處置費</span><span>$${val}</span></div>`;
+            }
+
+            // 4. 常規住院服務 (依輸入天數計算)
+            const stayInput = document.getElementById('fee_stay_input');
+            const stayTxt = document.getElementById('stay_nights_txt');
+            if (stayInput) {
+                let days = parseInt(stayInput.value) || 0;
+                if (days > 0) {
+                    let stayCost = days * 300;
+                    total += stayCost;
+                    stayTxt.innerText = `${days} 晚 (+$${stayCost})`;
+                    stayTxt.className = "text-warning small fw-bold font-monospace";
+                    itemsHtml += `<div class='d-flex justify-content-between text-white-50'><span>• 常規住院 (${days} 晚)</span><span>$${stayCost}</span></div>`;
+                } else {
+                    stayTxt.innerText = "不開立";
+                    stayTxt.className = "text-success small fw-bold font-monospace";
+                }
+            }
+
+            // 結尾加上應付總額
+            itemsHtml += `<div class='border-top border-secondary mt-1 pt-1 text-end text-success fw-bold'>應付總計：$${total}</div>`;
+
+            // 更新發票預覽區面板的內容
+            const invoiceContainer = document.getElementById('fee-invoice-items');
+            if (invoiceContainer) invoiceContainer.innerHTML = itemsHtml;
+
+            // 更新底部大按鈕顯示的總額與全域變數
+            currentTotalFeeGlobal = total;
+            if (feeTotalDisplay) feeTotalDisplay.innerText = `總計醫藥費：$${total} (點擊直接複製金額)`;
+        }
+
+        // 點擊複製純金額
+        function copyFeeResult() {
+            let msg = `${currentTotalFeeGlobal}`;
+            navigator.clipboard.writeText(msg).then(() => {
+                if (feeStatus) {
+                    feeStatus.innerText = `✅ 已成功複製總金額：$${currentTotalFeeGlobal}！`;
+                    setTimeout(() => feeStatus.innerText = '', 2000);
+                }
+            });
+        }
+
+        // 確保初始載入時先刷新一次
+        document.addEventListener("DOMContentLoaded", function () {
+            calculateTotalFee();
         });
-    }
 
-    initMedicalTab();
-</script>
+        // ==========================================
+        // 🛠️ 純 JS 分頁切換器
+        // ==========================================
+        function switchMainTab(targetTabId) {
+            document.querySelectorAll('.tab-content .tab-pane').forEach(pane => {
+                pane.classList.remove('show', 'active');
+            });
+            document.querySelectorAll('#mainTabs .nav-link').forEach(btn => {
+                btn.classList.remove('active');
+                btn.setAttribute('aria-selected', 'false');
+            });
+
+            const targetPane = document.getElementById(targetTabId);
+            if (targetPane) {
+                targetPane.classList.add('show', 'active');
+            }
+
+            const targetBtn = document.querySelector(`[aria-controls="${targetTabId}"]`);
+            if (targetBtn) {
+                targetBtn.classList.add('active');
+                targetBtn.setAttribute('aria-selected', 'true');
+            }
+
+            if (targetTabId === 'drugs-tab') {
+                renderDrugTable();
+            }
+        }
+
+        // ==========================================
+        // 鍵盤快捷鍵管理
+        // ==========================================
+        document.addEventListener('keydown', (e) => {
+            const isDispatchActive = document.getElementById('dispatch-tab')?.classList.contains('active');
+            const isTreatmentActive = document.getElementById('treatment-tab')?.classList.contains('active');
+            const isDrugsActive = document.getElementById('drugs-tab')?.classList.contains('active');
+
+            // 1. 全域 Tab 鍵切換分頁（排除搜尋框與計價器數字欄位）
+            if (e.key === 'Tab' && document.activeElement !== searchBar && document.activeElement.type !== 'number') {
+                e.preventDefault();
+
+                if (isDispatchActive) {
+                    switchMainTab('treatment-tab');
+                } else if (isTreatmentActive) {
+                    switchMainTab('drugs-tab');
+                } else if (isDrugsActive) {
+                    switchMainTab('dispatch-tab');
+                }
+                return;
+            }
+
+            // 2. 個別分頁內的快捷鍵
+            if (isDispatchActive) {
+                if (e.key === 'Tab') {
+                    e.preventDefault();
+                    setDispatchMode(currentDispatchMode === 'dispatched' ? 'gps' : 'dispatched');
+                    return;
+                }
+                if (e.key === 'Enter' && input.value.trim() !== "") {
+                    copyDispatch();
+                    input.value = '';
+                    updateDispatchOutput();
+                }
+            } else if (isTreatmentActive) {
+                if (e.key.toLowerCase() === 'f' && document.activeElement !== searchBar) {
+                    e.preventDefault();
+                    searchBar.focus();
+                    searchBar.select();
+                }
+                if (document.activeElement === searchBar) {
+                    let currentIndex = filteredKeys.indexOf(currentInjuryKey);
+                    if (e.key === 'ArrowDown') { e.preventDefault(); selectInjury(filteredKeys[(currentIndex + 1) % filteredKeys.length]); }
+                    if (e.key === 'ArrowUp') { e.preventDefault(); selectInjury(filteredKeys[(currentIndex - 1 + filteredKeys.length) % filteredKeys.length]); }
+                    if (e.key === 'Enter') { e.preventDefault(); searchBar.blur(); }
+                    return;
+                }
+                if (e.key === 'Enter') {
+                    const steps = treatmentMessages[currentInjuryKey].steps;
+                    if (currentStepIndex < steps.length) {
+                        copyText(steps[currentStepIndex], treatmentStatus);
+                        currentStepIndex++;
+                        checkAndSkipDivider();
+                        renderSteps();
+                    } else {
+                        treatmentStatus.innerText = '✨ 本輪處置已全部完成！按 F 搜尋下一單。';
+                    }
+                }
+            }
+        });
+
+        function copyDispatch() {
+            const text = dispatchOutput.innerText;
+            if (text === '等待輸入...') return;
+            navigator.clipboard.writeText(text).then(() => {
+                dispatchStatus.innerText = '✅ 已複製調度指令！';
+                setTimeout(() => dispatchStatus.innerText = '', 2000);
+            });
+        }
+
+        initMedicalTab();
+    </script>
+</body>
+
+</html>
