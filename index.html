@@ -325,6 +325,23 @@
             border-left-color: var(--primary);
         }
 
+/* 純顯示用的醫囑區塊樣式 */
+.medical-note-box {
+    background: rgba(255, 183, 3, 0.08); /* 微微的警告橘黃色透明背景 */
+    border: 1px dashed rgba(255, 183, 3, 0.3); /* 虛線外框 */
+    border-left: 5px solid #ffb703; /* 醒目的黃色厚左邊框 */
+    padding: 12px 15px;
+    border-radius: 6px;
+    color: #ffd54f; /* 亮黃色文字，方便RP時直接看著唸 */
+    font-size: 0.95rem;
+    line-height: 1.6;
+    user-select: text; /* 雖然不能點擊複製，但萬一哪天需要時依然可以用滑鼠手動選取文字 */
+}
+
+.note-content {
+    word-break: break-all;
+}
+
         /* 藥物分類專屬左側點選樣式 */
         .category-item.active[data-cat="anes"] {
             background: #201c2b;
@@ -805,180 +822,191 @@
         // 資料庫中心
         // ==========================================
         const treatmentMessages = {
-            "abrasion": {
-                name: "大面積擦挫傷處置",
-                steps: [
-                    "/me 使用生理食鹽水沖洗傷口泥沙與雜質",
-                    "/me 使用優碘消毒受傷部位",
-                    "/me 塗抹抗生素消炎軟膏",
-                    "/me 覆蓋無菌紗布並使用網狀繃帶包紮"
-                ]
-            },
-            "bullet": {
-                name: "槍傷(子彈擦傷)",
-                steps: [
-                    "/me 使用生理食鹽水灌洗槍傷彈孔",
-                    "/me 進行術區消毒並鋪設無菌洞巾",
-                    "/me 於患部周圍施打局部麻醉",
-                    "/me 使用手術刀擴大傷口並用血管鉗夾出子彈彈片",
-                    "/me 使用外科剪刀剪除彈道周圍壞死組織",
-                    "/me 使用帶針縫線間斷縫合深層組織與皮膚",
-                    "/me 塗抹抗生素藥膏並覆蓋紗布加壓貼牢"
-                ]
-            },
-            "bullet_embedded": {
-                name: "槍傷(子彈嵌入)",
-                steps: [
-                    "---- 院外應急處置 ----",
-                    "/me 使用無菌敷料進行加壓止血",
-                    "---- 院內手術程序 ----",
-                    "/me On IC，並輸注生理食鹽水",
-                    "/me On Monitor(監測心跳、血壓與血氧)",
-                    "/me 經由靜脈注射全身麻醉藥物",
-                    "/me 執行氣管內插管並連接呼吸器",
-                    "/me 使用優碘進行大範圍術區消毒並鋪單",
-                    "/me 使用手術刀沿彈孔向外延伸切開皮膚",
-                    "/me 使用撐開器顯錄深部肌肉與彈道視野",
-                    "/me 使用吸引器清除彈道內積血與組織碎屑",
-                    "/me 利用移動式X光機(C-Arm)定位子彈深度",
-                    "/me 使用血管鉗順著彈道夾住子彈",
-                    "/me 小心取出子彈並放置於器械盤中",
-                    "/me 使用血管鉗夾閉深部活動性出血點",
-                    "/me 使用電燒儀進行深部組織燒灼止血",
-                    "/me 以大量生理食鹽水深度灌洗彈道傷口",
-                    "/me 置入橡皮引流條以利後續滲出液排出",
-                    "/me 使用可吸收縫線逐層縫合受損肌肉與筋膜",
-                    "/me 使用外科縫線關閉皮膚傷口",
-                    "/me 敷設無菌敷料並使用繃帶加壓包紮"
-                ]
-            },
-            "mild_burn": {
-                name: "燒燙傷（一度至淺二度）處置",
-                steps: [
-                    "---- 院外應急處置 ----",
-                    "/me 使用低溫生理食鹽水持續沖洗",
-                    "---- 院內常規處置 ----",
-                    "/me 使用無菌生理食鹽水溫和清潔燙傷區域",
-                    "/me 对完整未破裂的水泡進行消毒並保留表皮",
-                    "/me 使用無菌針頭對過大水泡進行低位引流排空組織液",
-                    "/me 於患部均勻塗抹一層石蠟燙傷膏",
-                    "/me 使用無菌疏鬆紗布覆蓋並以網狀繃帶輕柔固定",
-                ]
-            },
-            "burn": {
-                name: "燒燙傷（深二度）清創處置",
-                steps: [
-                    "/me 使用低溫生理食鹽水持續沖洗",
-                    "/me 建立靜脈通道並注射止痛藥物",
-                    "/me 使用無菌鑷子與外科剪刀清除壞死表皮組織",
-                    "/me 以抗菌溶液與生理食鹽水交替沖洗傷口",
-                    "/me 均勻塗抹磺胺銀燒燙傷專用藥膏",
-                    "/me 覆蓋無菌疏鬆紗布並以彈性繃帶纏繞固定"
-                ]
-            },
-            "fracture_surgery": {
-                name: "骨折固定與復位手術",
-                steps: [
-                    "---- 院外應急處置 ----",
-                    "/me 使用夾板固定患肢",
-                    "---- 院內手術程序 ----",
-                    "/me On IC，並輸注生理食鹽水",
-                    "/me On Monitor(監測心跳、血壓與血氧)",
-                    "/me 經由靜脈注射全身麻醉藥物",
-                    "/me 執行氣管內插管並連接呼吸器",
-                    "/me 使用手術刀切開骨折患部皮膚與皮下組織",
-                    "/me 使用撐開器顯露骨折斷端",
-                    "/me 以生理食鹽水沖洗並移除碎骨與異物",
-                    "/me 使用骨復位鉗將骨折復位並安置鎖定鋼板",
-                    "/me 鑽孔並鎖入螺釘固定鋼板與骨骼",
-                    "/me 利用移動式X光機(C-Arm)確認對位",
-                    "/me 縫合受損血管與神經",
-                    "/me 依解剖層次逐層縫合筋膜與肌肉組織",
-                    "/me 縫合皮膚表面",
-                    "/me 傷口覆蓋無菌敷料並使用繃帶固定",
-                    "/me 石膏固定患肢"
-                ]
-            },
-            "drowning": {
-                name: "溺水處置",
-                steps: [
-                    "---- 院外應急處置 ----",
-                    "/me 清除患者口鼻內泥沙與嘔吐物，保持呼吸道通暢",
-                    "/me 給予高濃度氧氣面罩",
-                    "---- 院內搶救程序 ----",
-                    "/me 建立靜脈通道並裝上生命徵象監測儀",
-                    "/me 使用溫毯與溫熱點滴進行中心主體復溫"
-                ]
-            },
-            "hypoglycemia": {
-                name: "低血糖昏迷處置",
-                steps: [
-                    "---- 院外應急處置 ----",
-                    "/me 建立靜脈通路，緩慢推注高濃度葡萄糖溶液（D50）",
-                    "---- 院內治療程序 ----",
-                    "/me 靜脈滴注維持性葡萄糖輸液（D10）",
-                    "/me 定時監測每 15 分鐘的末梢血糖變化"
-                ]
-            },
-            "foreign": {
-                name: "深部異物/玻璃碎片取出術",
-                steps: [
-                    "/me 使用生理食鹽水沖洗周圍血跡",
-                    "/me 使用優碘從傷口邊緣向外進行消毒",
-                    "/me 使用精密醫療鑷子深入傷口夾除異物碎片",
-                    "/me 使用生理食鹽水深入傷口內部進行壓力灌洗",
-                    "/me 塗抹抗生素軟膏",
-                    "/me 覆蓋無菌敷料膠帶固定"
-                ]
-            },
-            "thoracic_rupture": {
-                name: "胸腔破裂與開放性氣胸手術",
-                steps: [
-                    "---- 院外應急處置 ----",
-                    "/me 使用無菌加壓敷料覆蓋胸壁開放性傷口",
-                    "/me 執行胸腔針刺減壓術以釋放張力性氣胸壓力",
-                    "---- 院內手術程序 ----",
-                    "/me 建立雙路大口徑靜脈留置針並快速輸血",
-                    "/me 執行氣管內插管並連接呼吸器正壓給氧",
-                    "/me 經由靜脈注射全身麻醉與肌肉鬆弛劑",
-                    "/me 使用手術刀進行開胸手術切開胸壁",
-                    "/me 置入胸腔置開器撐開肋骨顯露胸腔",
-                    "/me 使用強力吸引器清除胸腔內大量積血",
-                    "/me 使用血管鉗快速夾閉活動性噴血血管",
-                    "/me 探查肺臟裂傷並使用組織縫合器進行修補",
-                    "/me 檢查心臟及大血管壁並進行細緻縫合",
-                    "/me 使用大量溫生理食鹽水徹底沖洗胸腔",
-                    "/me 於患側置入胸腔引流管並連接水封瓶",
-                    "/me 使用不銹鋼鋼絲固定並縫合肋骨",
-                    "/me 依序逐層縫合胸壁肌肉、皮下組織與皮膚",
-                    "/me 覆蓋無菌敷料並加壓固定"
-                ]
-            },
-            "abdominal_rupture": {
-                name: "腹腔臟器破裂與大出血手術",
-                steps: [
-                    "---- 院外應急處置 ----",
-                    "/me 使用無菌濕敷料覆蓋保護脫出之腹腔臟器",
-                    "/me 建立靜脈通道並給予限額補液維持血壓",
-                    "---- 院內手術程序 ----",
-                    "/me 建立中心靜脈導管並啟動大量輸血協定",
-                    "/me 執行氣管內插管並引導全身麻醉狀態",
-                    "/me 使用手術刀沿腹正中線切開腹壁各層組織",
-                    "/me 使用腹腔撐開器顯露腹腔視野",
-                    "/me 使用吸引器迅速吸除腹腔內積血與胃腸內容物",
-                    "/me 使用大量手術紗布墊進行全腹腔壓迫止血",
-                    "/me 探查肝脾等實質臟器裂傷並使用止血鉗夾閉",
-                    "/me 執行肝臟精密縫合止血",
-                    "/me 探查胃腸道破裂處並使用腸吻合器進行修補",
-                    "/me 使用數千毫升溫生理食鹽水反覆灌洗腹腔",
-                    "/me 於腹腔低位安置兩支矽膠引流管",
-                    "/me 仔細清點手術紗布與器械數目無誤",
-                    "/me 使用高強度縫線逐層縫合腹膜、筋膜與肌肉",
-                    "/me 使用外科縫線關閉腹壁皮膚傷口",
-                    "/me 敷設無菌敷料並妥善黏貼固定"
-                ]
-            }
-        };
+                "abrasion": {
+                    name: "大面積擦挫傷處置",
+                    steps: [
+                        "/me 使用生理食鹽水沖洗傷口泥沙與雜質",
+                        "/me 使用優碘消毒受傷部位",
+                        "/me 塗抹抗生素消炎軟膏",
+                        "/me 覆蓋無菌紗布並使用網狀繃帶包紮"
+                    ],
+                    note: "這幾天傷口千萬不能碰水，洗澡時可以用防水敷料保護。每天要定時更換紗布並塗抹消炎藥膏，如果發現傷口有紅腫、發熱或異常分泌物，一定要立刻回診。"
+                },
+                "bullet": {
+                    name: "槍傷(子彈擦傷)",
+                    steps: [
+                        "/me 使用生理食鹽水灌洗槍傷彈孔",
+                        "/me 進行術區消毒並鋪設無菌洞巾",
+                        "/me 於患部周圍施打局部麻醉",
+                        "/me 使用手術刀擴大傷口並用血管鉗夾出子彈彈片",
+                        "/me 使用外科剪刀剪除彈道周圍壞死組織",
+                        "/me 使用帶針縫線間斷縫合深層組織與皮膚",
+                        "/me 塗抹抗生素藥膏並覆蓋紗布加壓貼牢"
+                    ],
+                    note: "傷口已經縫合了，這陣子不要做劇烈運動，否則縫線會裂開，如果發現傷口有紅腫、發熱或異常分泌物，一定要立刻回診。"
+                },
+                "bullet_embedded": {
+                    name: "槍傷(子彈嵌入)",
+                    steps: [
+                        "---- 院外應急處置 ----",
+                        "/me 使用無菌敷料進行加壓止血",
+                        "---- 院內手術程序 ----",
+                        "/me On IC，並輸注生理食鹽水",
+                        "/me On Monitor(監測心跳、血壓與血氧)",
+                        "/me 經由靜脈注射全身麻醉藥物",
+                        "/me 執行氣管內插管並連接呼吸器",
+                        "/me 使用優碘進行大範圍術區消毒並鋪單",
+                        "/me 使用手術刀沿彈孔向外延伸切開皮膚",
+                        "/me 使用撐開器顯錄深部肌肉與彈道視野",
+                        "/me 使用吸引器清除彈道內積血與組織碎屑",
+                        "/me 利用移動式X光機(C-Arm)定位子彈深度",
+                        "/me 使用血管鉗順著彈道夾住子彈",
+                        "/me 小心取出子彈並放置於器械盤中",
+                        "/me 使用血管鉗夾閉深部活動性出血點",
+                        "/me 使用電燒儀進行深部組織燒灼止血",
+                        "/me 以大量生理食鹽水深度灌洗彈道傷口",
+                        "/me 置入橡皮引流條以利後續滲出液排出",
+                        "/me 使用可吸收縫線逐層縫合受損肌肉與筋膜",
+                        "/me 使用外科縫線關閉皮膚傷口",
+                        "/me 敷設無菌敷料並使用繃帶加壓包紮"
+                    ],
+                    note: "手術很成功，深層子彈已經取出了。目前傷口有留置引流條，我們會密切觀察引流液。請躺好靜養，千萬不要拉扯到管路。有任何劇烈疼痛或呼吸不適馬上叫醫護人員。"
+                },
+                "mild_burn": {
+                    name: "燒燙傷（一度至淺二度）處置",
+                    steps: [
+                        "---- 院外應急處置 ----",
+                        "/me 使用低溫生理食鹽水持續沖洗",
+                        "---- 院內常規處置 ----",
+                        "/me 使用無菌生理食鹽水溫和清潔燙傷區域",
+                        "/me 对完整未破裂的水泡進行消毒並保留表皮",
+                        "/me 使用無菌針頭對過大水泡進行低位引流排空組織液",
+                        "/me 於患部均勻塗抹一層石蠟燙傷膏",
+                        "/me 使用無菌疏鬆紗布覆蓋並以網狀繃帶輕柔固定"
+                    ],
+                    note: "水泡的表皮是天然的保護層，絕對不能自己把它抓破或撕掉。回去後多補充水分和蛋白質。敷料如果滲濕了要換藥，千萬別塗抹未經證實的偏方或牙膏，否則一定會嚴重感染。"
+                },
+                "burn": {
+                    name: "燒燙傷（深二度）清創處置",
+                    steps: [
+                        "/me 使用低溫生理食鹽水持續沖洗",
+                        "/me 建立靜脈通道並注射止痛藥物",
+                        "/me 使用無菌鑷子與外科剪刀清除壞死表皮組織",
+                        "/me 以抗菌溶液與生理食鹽水交替沖洗傷口",
+                        "/me 均勻塗抹磺胺銀燒燙傷專用藥膏",
+                        "/me 覆蓋無菌疏鬆紗布並以彈性繃帶纏繞固定"
+                    ],
+                    note: "深二度燙傷很容易留下疤痕，這幾天是關鍵期。清創後的傷口必須保持絕對無菌，紗布絕對不能碰水。這款磺胺銀藥膏能有效抑菌，請記得換藥。"
+                },
+                "fracture_surgery": {
+                    name: "骨折固定與復位手術",
+                    steps: [
+                        "---- 院外應急處置 ----",
+                        "/me 使用夾板固定患肢",
+                        "---- 院內手術程序 ----",
+                        "/me On IC，並輸注生理食鹽水",
+                        "/me On Monitor(監測心跳、血壓與血氧)",
+                        "/me 經由靜脈注射全身麻醉藥物",
+                        "/me 執行氣管內插管並連接呼吸器",
+                        "/me 使用手術刀切開骨折患部皮膚與皮下組織",
+                        "/me 使用撐開器顯錄骨折斷端",
+                        "/me 以生理食鹽水沖洗並移除碎骨與異物",
+                        "/me 使用骨復位鉗將骨折復位並安置鎖定鋼板",
+                        "/me 鑽孔並鎖入螺釘固定鋼板與骨骼",
+                        "/me 利用移動式X光機(C-Arm)確認對位",
+                        "/me 縫合受損血管與神經",
+                        "/me 依解剖層次逐層縫合筋膜與肌肉組織",
+                        "/me 縫合皮膚表面",
+                        "/me 傷口覆蓋無菌敷料並使用繃帶固定",
+                        "/me 石膏固定患肢"
+                    ],
+                    note: "鋼板固定手術很順利，外層也上石膏了。躺床時要把患肢墊高，促進血液回流消腫。如果發現石膏裡面的手指或腳趾變紫、變冰冷或麻木沒知覺，這代表壓迫到血管，必須立刻回急診！"
+                },
+                "drowning": {
+                    name: "溺水處置",
+                    steps: [
+                        "---- 院外應急處置 ----",
+                        "/me 清除患者口鼻內泥沙與嘔吐物，保持呼吸道通暢",
+                        "/me 給予高濃度氧氣面罩",
+                        "---- 院內搶救程序 ----",
+                        "/me 建立靜脈通道並裝上生命徵象監測儀",
+                        "/me 使用溫毯與溫熱點滴進行中心主體復溫"
+                    ],
+                    note: "雖然你現在清醒了，水也吐出來了，幕後溺水最怕引發『遲發性肺水腫』（俗稱乾溺）。如果出現咳嗽加劇、呼吸急促、胸痛或發燒，要馬上回醫院。"
+                },
+                "hypoglycemia": {
+                    name: "低血糖昏迷處置",
+                    steps: [
+                        "---- 院外應急處置 ----",
+                        "/me 建立靜脈通路，緩慢推注高濃度葡萄糖溶液（D50）",
+                        "---- 院內治療程序 ----",
+                        "/me 靜脈滴注維持性葡萄糖輸液（D10）",
+                        "/me 定時監測每 15 分鐘的末梢血糖變化"
+                    ],
+                    note: "血糖已經回升到安全範圍了，但你剛醒來體力還沒恢復，先躺著休息。以後出門包包裡一定要隨身攜帶糖果或方糖。只要一覺得頭暈、冒冷汗、手抖，就立刻吃糖，絕對不能餓過頭。"
+                },
+                "foreign": {
+                    name: "深部異物/玻璃碎片取出術",
+                    steps: [
+                        "/me 使用生理食鹽水沖洗周圍血跡",
+                        "/me 使用優碘從傷口邊緣向外進行消毒",
+                        "/me 使用精密醫療鑷子深入傷口夾除異物碎片",
+                        "/me 使用生理食鹽水深入傷口內部進行壓力灌洗",
+                        "/me 塗抹抗生素軟膏",
+                        "/me 覆蓋無菌敷料膠帶固定"
+                    ],
+                    note: "深層的異物和玻璃碎片都幫你清理乾淨了。因為這種傷口比較深，是破傷風的高風險群，我待會幫你補打一針破傷風疫苗。回家後傷口要保持乾燥，按時吃完消炎藥。"
+                },
+                "thoracic_rupture": {
+                    name: "胸腔破裂與開放性氣胸手術",
+                    steps: [
+                        "---- 院外應急處置 ----",
+                        "/me 使用無菌加壓敷料覆蓋胸壁開放性傷口",
+                        "/me 執行胸腔針刺減壓術以釋放張力性氣胸壓力",
+                        "---- 院內手術程序 ----",
+                        "/me 建立雙路大口徑靜脈留置針並快速輸血",
+                        "/me 執行氣管內插管並連接呼吸器正壓給氧",
+                        "/me 經由靜脈注射全身麻醉與肌肉鬆弛劑",
+                        "/me 使用手術刀進行開胸手術切開胸壁",
+                        "/me 置入胸腔置開器撐開肋骨顯露胸腔",
+                        "/me 使用強力吸引器清除胸腔內大量積血",
+                        "/me 使用血管鉗快速夾閉活動性噴血血管",
+                        "/me 探查肺臟裂傷並使用組織縫合器進行修補",
+                        "/me 檢查心臟及大血管壁並進行細緻縫合",
+                        "/me 使用大量溫生理食鹽水徹底沖洗胸腔",
+                        "/me 於患側置入胸腔引流管並連接水封瓶",
+                        "/me 使用不銹鋼鋼絲固定並縫合肋骨",
+                        "/me 依序逐層縫合胸壁肌肉、皮下組織與皮膚",
+                        "/me 覆蓋無菌敷料並加壓固定"
+                    ],
+                    note: "你剛經歷一場大手術。胸口現在插著引流管是用來排出胸腔內的血水和空氣，翻身或移動時千萬注意不要壓到或扯斷管子，水封瓶也絕對不能倒地。痛的話可以按術後自控止痛，一定要嘗試深呼吸才不會造成肺塌陷。"
+                },
+                "abdominal_rupture": {
+                    name: "腹腔臟器破裂與大出血手術",
+                    steps: [
+                        "---- 院外應急處置 ----",
+                        "/me 使用無菌濕敷料覆蓋保護脫出之腹腔臟器",
+                        "/me 建立靜脈通道並給予限額補液維持血壓",
+                        "---- 院內手術程序 ----",
+                        "/me 建立中心靜脈導管並啟動大量輸血協定",
+                        "/me 執行氣管內插管並引導全身麻醉狀態",
+                        "/me 使用手術刀沿腹正中線切開腹壁各層組織",
+                        "/me 使用腹腔撐開器顯錄腹腔視野",
+                        "/me 使用吸引器迅速吸除腹腔內積血與胃腸內容物",
+                        "/me 使用大量手術紗布墊進行全腹腔壓迫止血",
+                        "/me 探查肝脾等實質臟器裂傷並使用止血鉗夾閉",
+                        "/me 執行肝臟精密縫合止血",
+                        "/me 探查胃腸道破裂處並使用腸吻合器進行修補",
+                        "/me 使用數千毫升溫生理食鹽水反覆灌洗腹腔",
+                        "/me 於腹腔低位安置兩支矽膠引流管",
+                        "/me 仔細清點手術紗布與器械數目無誤",
+                        "/me 使用高強度縫線逐層縫合腹膜、筋膜與肌肉",
+                        "/me 使用外科縫線關閉腹壁皮膚傷口",
+                        "/me 敷設無菌敷料並妥善黏貼固定"
+                    ],
+                    note: "你的腸胃道有進行修補，在還沒有排氣（放屁）之前，絕對、絕對不可以吃任何東西，連水都不能喝！否則縫線裂開會導致嚴重的腹膜炎，那就得重新開肚子手術了。"
+                }
+            };
 
         const drugList = [
             { name: "Propofol (異丙酚)", type: "anes", effect: "迅速誘導全身麻醉、維持昏迷狀態", me: "/me 經由靜脈留置針注射 Propofol 進行全身麻醉" },
@@ -1010,136 +1038,190 @@
             { name: "Diphenhydramine (苯海拉明)", type: "other", effect: "抗組織胺、治療嚴重過敏反應與蕁麻疹", me: "/me 肌肉注射 Diphenhydramine 針劑以迅速緩解過敏性免疫反應" },
             { name: "Activated Charcoal (活性碳)", type: "other", effect: "口服毒物、藥物過量之腸胃道吸附洗胃處置", me: "/me 經由胃管向胃內灌注活性碳懸浮液以吸附殘留毒物" },
             { name: "Calcium Gluconate (葡萄糖酸鈣)", type: "other", effect: "解高血鉀毒性、保護心臟、解硫酸鎂中毒", me: "/me 經靜脈緩慢推注 Calcium Gluconate 以穩定心肌細胞膜電位" },
-            { name: "Sterile Water (無菌沖洗水)", type: "other", effect: "催淚瓦斯、化學品、強酸強鹼皮膚與眼部洗消", me: "/me 使用大量 Sterile Water 無菌水持續沖洗患者受污染的皮膚與眼部" }
+            { name: "Sterile Water (無菌沖洗水)", type: "other", effect: "催淚瓦斯、化學品、強酸強鹼皮膚與眼部洗消", me: "/me 使用大量 Sterile Water 無菌水持續沖洗患者受污染的皮膚與眼部" },
+            { name: "Phentolamine (酚妥拉明)", type: "cardio", effect: "血管擴張劑、搶救高血壓危象、解救去甲腎上腺素外滲之組織壞死", me: "/me 經由靜脈緩慢注射 Phentolamine 以迅速擴張血管並調降危險高血壓" }
         ];
 
         let currentInjuryKey = 'fracture_surgery';
-        let currentStepIndex = 0;
-        let filteredKeys = Object.keys(treatmentMessages);
-        let currentDrugCat = 'anes';
+            let currentStepIndex = 0;
+            let filteredKeys = Object.keys(treatmentMessages);
+            let currentDrugCat = 'anes';
 
-        const input = document.getElementById('charID');
-        const dispatchOutput = document.getElementById('dispatch-output');
-        const dispatchStatus = document.getElementById('dispatch-status');
-        let currentDispatchMode = 'dispatched';
-        const dispatchMessages = { dispatched: "醫護已派遣，請耐心等候", gps: "請按壓/311p按鈕，發送GPS定位，以利醫護同仁搜救作業" };
+            const input = document.getElementById('charID');
+            const dispatchOutput = document.getElementById('dispatch-output');
+            const dispatchStatus = document.getElementById('dispatch-status');
+            let currentDispatchMode = 'dispatched';
+            const dispatchMessages = { dispatched: "醫護已派遣，請耐心等候", gps: "請按壓/311p按鈕，發送GPS定位，以利醫護同仁搜救作業" };
 
-        // ✨ ✨ ✨ 【核心修復】補回基礎文字複製函數 ✨ ✨ ✨
-        function copyText(text, statusElement) {
-            navigator.clipboard.writeText(text).then(() => {
-                if (statusElement) {
-                    statusElement.innerText = `✅ 已成功複製：${text.substring(0, 15)}...`;
-                    setTimeout(() => statusElement.innerText = '', 2000);
+            // ✨ ✨ ✨ 【核心修復】補回基礎文字複製函數 ✨ ✨ ✨
+            function copyText(text, statusElement) {
+                navigator.clipboard.writeText(text).then(() => {
+                    if (statusElement) {
+                        statusElement.innerText = `✅ 已成功複製：${text.substring(0, 15)}...`;
+                        setTimeout(() => statusElement.innerText = '', 2000);
+                    }
+                }).catch(err => {
+                    if (statusElement) statusElement.innerText = `❌ 複製失敗，請手動複製`;
+                });
+            }
+
+            function setDispatchMode(mode) {
+                currentDispatchMode = mode;
+                document.querySelectorAll('.mode-btn').forEach(btn => btn.classList.toggle('active', btn.dataset.mode === mode));
+                dispatchOutput.style.color = mode === 'dispatched' ? '#00ffcc' : '#ffcc00';
+                updateDispatchOutput();
+            }
+            function updateDispatchOutput() {
+                const val = input.value.trim();
+                dispatchOutput.innerText = val ? `/311r ${val} ${dispatchMessages[currentDispatchMode]}` : '等待輸入...';
+            }
+            input.addEventListener('input', updateDispatchOutput);
+
+            const searchBar = document.getElementById('searchBar');
+            const injuryContainer = document.getElementById('injury-container');
+            const stepContainer = document.getElementById('step-container');
+            const treatmentStatus = document.getElementById('treatment-status');
+
+            // 初始化主控台
+            function initMedicalTab() {
+                renderInjuryList();
+                checkAndSkipDivider();
+                renderSteps();
+                renderDrugTable();
+                calculateTotalFee(); // 初始化計價面板數據
+            }
+            function checkAndSkipDivider() {
+                const steps = treatmentMessages[currentInjuryKey]?.steps || [];
+                if (steps[currentStepIndex] && steps[currentStepIndex].startsWith('----')) currentStepIndex++;
+            }
+            searchBar.addEventListener('input', () => {
+                const query = searchBar.value.toLowerCase().trim();
+                filteredKeys = Object.keys(treatmentMessages).filter(key => treatmentMessages[key].name.toLowerCase().includes(query) || key.includes(query));
+                renderInjuryList();
+                if (filteredKeys.length > 0 && !filteredKeys.includes(currentInjuryKey)) selectInjury(filteredKeys[0]);
+            });
+            function renderInjuryList() {
+                injuryContainer.innerHTML = '';
+                filteredKeys.forEach(key => {
+                    const div = document.createElement('div');
+                    div.className = `injury-item ${key === currentInjuryKey ? 'active' : ''}`;
+                    div.innerText = treatmentMessages[key].name;
+                    div.onclick = () => selectInjury(key);
+                    injuryContainer.appendChild(div);
+                });
+            }
+            function selectInjury(key) {
+                currentInjuryKey = key;
+                currentStepIndex = 0;
+                renderInjuryList();
+                checkAndSkipDivider();
+                renderSteps();
+            }
+
+            // ✨ ✨ ✨ 【修改重点 1】優化渲染步驟與醫囑樣式 ✨ ✨ ✨
+            function renderSteps() {
+                    stepContainer.innerHTML = '';
+                    const data = treatmentMessages[currentInjuryKey];
+                    if (!data) return;
+
+                    // 1. 渲染處置步驟 (steps)
+                    data.steps.forEach((text, index) => {
+                        const div = document.createElement('div');
+                        if (text.startsWith('----')) {
+                            div.className = 'section-divider';
+                            div.innerText = text.replace(/^-+\s*|\s*-+$/g, '');
+                            stepContainer.appendChild(div);
+                            return;
+                        }
+                        div.className = 'step-item';
+                        if (index === currentStepIndex) div.classList.add('next-up');
+                        if (index < currentStepIndex) div.classList.add('copied');
+                        div.innerHTML = `<div class="d-flex justify-content-between align-items-center"><span>${text}</span><span class="copy-badge">${index === currentStepIndex ? 'ENTER 複製' : (index < currentStepIndex ? '已複製' : '點擊複製')}</span></div>`;
+                        div.onclick = () => {
+                            copyText(text, treatmentStatus);
+                            currentStepIndex = index + 1;
+                            checkAndSkipDivider();
+                            renderSteps();
+                        };
+                        stepContainer.appendChild(div);
+                    });
+
+                    // 2. 渲染純口述醫囑提示（移除複製功能與 badge）
+                    if (data.note) {
+                        // 建立一個區隔標籤
+                        const divider = document.createElement('div');
+                        divider.className = 'section-divider';
+                        divider.style.color = '#ffb703'; // 使用警告黃色強調
+                        divider.innerText = '醫囑與注意事項 (純口述內容)';
+                        stepContainer.appendChild(divider);
+
+                        // 建立純顯示的 Note 區塊
+                        const noteDiv = document.createElement('div');
+                        noteDiv.className = 'medical-note-box'; // 套用下方專屬的純顯示樣式
+                        noteDiv.innerHTML = `<div class="note-content">💡 ${data.note}</div>`;
+
+                        stepContainer.appendChild(noteDiv);
+                    }
                 }
-            }).catch(err => {
-                if (statusElement) statusElement.innerText = `❌ 複製失敗，請手動複製`;
-            });
-        }
 
-        function setDispatchMode(mode) {
-            currentDispatchMode = mode;
-            document.querySelectorAll('.mode-btn').forEach(btn => btn.classList.toggle('active', btn.dataset.mode === mode));
-            dispatchOutput.style.color = mode === 'dispatched' ? '#00ffcc' : '#ffcc00';
-            updateDispatchOutput();
-        }
-        function updateDispatchOutput() {
-            const val = input.value.trim();
-            dispatchOutput.innerText = val ? `/311r ${val} ${dispatchMessages[currentDispatchMode]}` : '等待輸入...';
-        }
-        input.addEventListener('input', updateDispatchOutput);
+            const drugTableBody = document.getElementById('drug-table-body');
+            const drugsStatus = document.getElementById('drugs-status');
 
-        const searchBar = document.getElementById('searchBar');
-        const injuryContainer = document.getElementById('injury-container');
-        const stepContainer = document.getElementById('step-container');
-        const treatmentStatus = document.getElementById('treatment-status');
+            function switchDrugCat(cat) {
+                currentDrugCat = cat;
+                document.querySelectorAll('#drug-cats-container .category-item').forEach(item => item.classList.toggle('active', item.dataset.cat === cat));
+                renderDrugTable();
+            }
 
-        // 初始化主控台
-        function initMedicalTab() {
-            renderInjuryList();
-            checkAndSkipDivider();
-            renderSteps();
-            renderDrugTable();
-            calculateTotalFee(); // 初始化計價面板數據
-        }
-        function checkAndSkipDivider() {
-            const steps = treatmentMessages[currentInjuryKey]?.steps || [];
-            if (steps[currentStepIndex] && steps[currentStepIndex].startsWith('----')) currentStepIndex++;
-        }
-        searchBar.addEventListener('input', () => {
-            const query = searchBar.value.toLowerCase().trim();
-            filteredKeys = Object.keys(treatmentMessages).filter(key => treatmentMessages[key].name.toLowerCase().includes(query) || key.includes(query));
-            renderInjuryList();
-            if (filteredKeys.length > 0 && !filteredKeys.includes(currentInjuryKey)) selectInjury(filteredKeys[0]);
-        });
-        function renderInjuryList() {
-            injuryContainer.innerHTML = '';
-            filteredKeys.forEach(key => {
-                const div = document.createElement('div');
-                div.className = `injury-item ${key === currentInjuryKey ? 'active' : ''}`;
-                div.innerText = treatmentMessages[key].name;
-                div.onclick = () => selectInjury(key);
-                injuryContainer.appendChild(div);
-            });
-        }
-        function selectInjury(key) {
-            currentInjuryKey = key;
-            currentStepIndex = 0;
-            renderInjuryList();
-            checkAndSkipDivider();
-            renderSteps();
-        }
-        function renderSteps() {
-            stepContainer.innerHTML = '';
-            const data = treatmentMessages[currentInjuryKey];
-            if (!data) return;
-            data.steps.forEach((text, index) => {
-                const div = document.createElement('div');
-                if (text.startsWith('----')) {
-                    div.className = 'section-divider';
-                    div.innerText = text.replace(/^-+\s*|\s*-+$/g, '');
-                    stepContainer.appendChild(div);
-                    return;
-                }
-                div.className = 'step-item';
-                if (index === currentStepIndex) div.classList.add('next-up');
-                if (index < currentStepIndex) div.classList.add('copied');
-                div.innerHTML = `<div class="d-flex justify-content-between align-items-center"><span>${text}</span><span class="copy-badge">${index === currentStepIndex ? 'ENTER 複製' : (index < currentStepIndex ? '已複製' : '點擊複製')}</span></div>`;
-                div.onclick = () => {
-                    copyText(text, treatmentStatus);
-                    currentStepIndex = index + 1;
-                    checkAndSkipDivider();
-                    renderSteps();
-                };
-                stepContainer.appendChild(div);
-            });
-        }
+            function renderDrugTable() {
+                if (!drugTableBody) return; // 安全檢查
+                drugTableBody.innerHTML = '';
+                const targetDrugs = drugList.filter(d => d.type === currentDrugCat);
 
-        const drugTableBody = document.getElementById('drug-table-body');
-        const drugsStatus = document.getElementById('drugs-status');
-
-        function switchDrugCat(cat) {
-            currentDrugCat = cat;
-            document.querySelectorAll('#drug-cats-container .category-item').forEach(item => item.classList.toggle('active', item.dataset.cat === cat));
-            renderDrugTable();
-        }
-
-        function renderDrugTable() {
-            if (!drugTableBody) return; // 安全檢查
-            drugTableBody.innerHTML = '';
-            const targetDrugs = drugList.filter(d => d.type === currentDrugCat);
-
-            targetDrugs.forEach(drug => {
-                const tr = document.createElement('tr');
-                tr.className = 'drug-row';
-                tr.innerHTML = `
+                targetDrugs.forEach(drug => {
+                    const tr = document.createElement('tr');
+                    tr.className = 'drug-row';
+                    tr.innerHTML = `
                             <td class="fw-bold text-white">${drug.name}</td>
                             <td class="drug-effect-highlight">${drug.effect}</td>
                             <td><div class="table-drug-me" title="${drug.me}">${drug.me}</div></td>
                         `;
-                tr.onclick = () => copyText(drug.me, drugsStatus);
-                drugTableBody.appendChild(tr);
+                    tr.onclick = () => copyText(drug.me, drugsStatus);
+                    drugTableBody.appendChild(tr);
+                });
+            }
+
+            // ✨ ✨ ✨ 【修改重点 2】如果你程式碼後面有監聽鍵盤 Enter 鍵，請把原有的 Enter 改成下面這樣 ✨ ✨ ✨
+            window.addEventListener('keydown', (e) => {
+                // 這裡對應你原本程式碼裡的 Enter 鍵複製邏輯
+                if (e.key === 'Enter' && !e.shiftKey) {
+                    // 如果焦點不在搜尋框或輸入框才執行快捷鍵
+                    if (document.activeElement === searchBar || document.activeElement === input) return;
+
+                    const data = treatmentMessages[currentInjuryKey];
+                    if (!data) return;
+
+                    // 情況 A：還有手術步驟沒按完
+                    if (currentStepIndex < data.steps.length) {
+                        e.preventDefault();
+                        copyText(data.steps[currentStepIndex], treatmentStatus);
+                        currentStepIndex++;
+                        checkAndSkipDivider();
+                        renderSteps();
+                    }
+                    // 情況 B：步驟按完了，剛好停在醫囑（currentStepIndex 等於長度）
+                    else if (currentStepIndex === data.steps.length && data.note) {
+                        e.preventDefault();
+                        copyText(data.note, treatmentStatus);
+                        currentStepIndex++; // 結束本單
+                        renderSteps();
+                    }
+                    // 情況 C：全部處置完畢
+                    else {
+                        treatmentStatus.innerText = '✨ 本輪處置與醫囑已全部完成！按 F 搜尋下一單。';
+                    }
+                }
             });
-        }
 
         // ==========================================
         // 💰 醫藥費功能中心 (排版優化 + 邊框動態反饋)
