@@ -342,6 +342,8 @@
     word-break: break-all;
 }
 
+
+
         /* 藥物分類專屬左側點選樣式 */
         .category-item.active[data-cat="anes"] {
             background: #201c2b;
@@ -709,9 +711,8 @@
 
         <ul class="nav nav-tabs justify-content-center mb-4" id="mainTabs" role="tablist">
             <li class="nav-item" role="presentation">
-                <button class="nav-link active" id="tab-dispatch-btn" type="button" role="tab"
-                    aria-controls="dispatch-tab" aria-selected="true" onclick="switchMainTab('dispatch-tab')">311r
-                    調度</button>
+                <button class="nav-link active" id="tab-dispatch-btn" type="button" role="tab" aria-controls="dispatch-tab"
+                    aria-selected="true" onclick="switchMainTab('dispatch-tab')">311r 調度</button>
             </li>
             <li class="nav-item" role="presentation">
                 <button class="nav-link" id="tab-treatment-btn" type="button" role="tab" aria-controls="treatment-tab"
@@ -934,6 +935,24 @@
                     ],
                     note: "雖然你現在清醒了，水也吐出來了，幕後溺水最怕引發『遲發性肺水腫』（俗稱乾溺）。如果出現咳嗽加劇、呼吸急促、胸痛或發燒，要馬上回醫院。"
                 },
+                "laceration": {
+                name: "嚴重撕裂傷處置與縫合術",
+                steps: [
+                    "---- 院外應急處置 ----",
+                    "/me 使用無菌無紡布加壓傷口止血",
+                    "---- 院內縫合程序 ----",
+                    "/me 使用大量生理食鹽水加壓沖洗撕裂傷口",
+                    "/me 使用優碘進行患部周圍大範圍消毒並鋪單",
+                    "/me 於撕裂傷組織邊緣分點注射 Lidocaine 局部麻醉",
+                    "/me 使用無菌鑷子探查傷口深處是否殘留異物",
+                    "/me 使用組織剪修剪邊緣不規則的失活組織",
+                    "/me 使用持針器夾持帶針縫線進行深層肌肉筋膜縫合",
+                    "/me 使用帶針尼龍線進行皮膚層對位間斷縫合",
+                    "/me 使用生理食鹽水拭淨周圍血跡並再次點塗優碘",
+                    "/me 覆蓋無菌敷料並妥善黏貼固定"
+                ],
+                note: "傷口已經幫你縫合好了。這幾天傷口『絕對不能碰水』，洗澡時可以用防水貼布保護。如果發現傷口周圍異常紅腫、發熱、甚至滲出黃色濃汁，或者發燒，一定要立刻回醫院拆線重新清創。"
+            },
                 "hypoglycemia": {
                     name: "低血糖昏迷處置",
                     steps: [
@@ -1042,6 +1061,10 @@
             { name: "Phentolamine (酚妥拉明)", type: "cardio", effect: "血管擴張劑、搶救高血壓危象、解救去甲腎上腺素外滲之組織壞死", me: "/me 經由靜脈緩慢注射 Phentolamine 以迅速擴張血管並調降危險高血壓" }
         ];
 
+
+    // ==========================================
+
+
         let currentInjuryKey = 'fracture_surgery';
             let currentStepIndex = 0;
             let filteredKeys = Object.keys(treatmentMessages);
@@ -1084,12 +1107,13 @@
 
             // 初始化主控台
             function initMedicalTab() {
-                renderInjuryList();
-                checkAndSkipDivider();
-                renderSteps();
-                renderDrugTable();
-                calculateTotalFee(); // 初始化計價面板數據
-            }
+                    renderInjuryList();
+                    checkAndSkipDivider();
+                    renderSteps();
+                    renderDrugTable();
+                    calculateTotalFee(); // 初始化計價面板數據
+                    initDiagnosticHelper(); // ✨ 新增這行：初始化診斷器
+                }
             function checkAndSkipDivider() {
                 const steps = treatmentMessages[currentInjuryKey]?.steps || [];
                 if (steps[currentStepIndex] && steps[currentStepIndex].startsWith('----')) currentStepIndex++;
@@ -1367,6 +1391,7 @@
         document.addEventListener('keydown', (e) => {
             const isDispatchActive = document.getElementById('dispatch-tab')?.classList.contains('active');
             const isTreatmentActive = document.getElementById('treatment-tab')?.classList.contains('active');
+            const isDiagnosticActive = document.getElementById('diagnostic-tab').classList.contains('active');
             const isDrugsActive = document.getElementById('drugs-tab')?.classList.contains('active');
 
             // 1. 全域 Tab 鍵切換分頁（排除搜尋框與計價器數字欄位）
@@ -1374,11 +1399,13 @@
                 e.preventDefault();
 
                 if (isDispatchActive) {
-                    switchMainTab('treatment-tab');
+                    switchMainTab('diagnostic-tab'); // 調度 -> 診斷
+                } else if (isDiagnosticActive) {
+                    switchMainTab('treatment-tab');  // 診斷 -> 主控台
                 } else if (isTreatmentActive) {
-                    switchMainTab('drugs-tab');
+                    switchMainTab('drugs-tab');      // 主控台 -> 常用藥
                 } else if (isDrugsActive) {
-                    switchMainTab('dispatch-tab');
+                    switchMainTab('dispatch-tab');   // 常用藥 -> 調度
                 }
                 return;
             }
