@@ -1062,353 +1062,297 @@
         ];
 
 
-    // ==========================================
+ let currentInjuryKey = 'fracture_surgery';
+    let currentStepIndex = 0;
+    let filteredKeys = Object.keys(treatmentMessages);
+    let currentDrugCat = 'anes';
 
+    const input = document.getElementById('charID');
+    const dispatchOutput = document.getElementById('dispatch-output');
+    const dispatchStatus = document.getElementById('dispatch-status');
+    let currentDispatchMode = 'dispatched';
+    const dispatchMessages = { dispatched: "醫護已派遣，請耐心等候", gps: "請按壓/311p按鈕，發送GPS定位，以利醫護同仁搜救作業" };
 
-        let currentInjuryKey = 'fracture_surgery';
-            let currentStepIndex = 0;
-            let filteredKeys = Object.keys(treatmentMessages);
-            let currentDrugCat = 'anes';
-
-            const input = document.getElementById('charID');
-            const dispatchOutput = document.getElementById('dispatch-output');
-            const dispatchStatus = document.getElementById('dispatch-status');
-            let currentDispatchMode = 'dispatched';
-            const dispatchMessages = { dispatched: "醫護已派遣，請耐心等候", gps: "請按壓/311p按鈕，發送GPS定位，以利醫護同仁搜救作業" };
-
-            // ✨ ✨ ✨ 【核心修復】補回基礎文字複製函數 ✨ ✨ ✨
-            function copyText(text, statusElement) {
-                navigator.clipboard.writeText(text).then(() => {
-                    if (statusElement) {
-                        statusElement.innerText = `✅ 已成功複製：${text.substring(0, 15)}...`;
-                        setTimeout(() => statusElement.innerText = '', 2000);
-                    }
-                }).catch(err => {
-                    if (statusElement) statusElement.innerText = `❌ 複製失敗，請手動複製`;
-                });
+    // 基礎文字複製函數
+    function copyText(text, statusElement) {
+        navigator.clipboard.writeText(text).then(() => {
+            if (statusElement) {
+                statusElement.innerText = `✅ 已成功複製：${text.substring(0, 15)}...`;
+                setTimeout(() => statusElement.innerText = '', 2000);
             }
+        }).catch(err => {
+            if (statusElement) statusElement.innerText = `❌ 複製失敗，請手動複製`;
+        });
+    }
 
-            function setDispatchMode(mode) {
-                currentDispatchMode = mode;
-                document.querySelectorAll('.mode-btn').forEach(btn => btn.classList.toggle('active', btn.dataset.mode === mode));
-                dispatchOutput.style.color = mode === 'dispatched' ? '#00ffcc' : '#ffcc00';
-                updateDispatchOutput();
-            }
-            function updateDispatchOutput() {
-                const val = input.value.trim();
-                dispatchOutput.innerText = val ? `/311r ${val} ${dispatchMessages[currentDispatchMode]}` : '等待輸入...';
-            }
-            input.addEventListener('input', updateDispatchOutput);
+    function setDispatchMode(mode) {
+        currentDispatchMode = mode;
+        document.querySelectorAll('.mode-btn').forEach(btn => btn.classList.toggle('active', btn.dataset.mode === mode));
+        dispatchOutput.style.color = mode === 'dispatched' ? '#00ffcc' : '#ffcc00';
+        updateDispatchOutput();
+    }
+    function updateDispatchOutput() {
+        const val = input.value.trim();
+        dispatchOutput.innerText = val ? `/311r ${val} ${dispatchMessages[currentDispatchMode]}` : '等待輸入...';
+    }
+    input.addEventListener('input', updateDispatchOutput);
 
-            const searchBar = document.getElementById('searchBar');
-            const injuryContainer = document.getElementById('injury-container');
-            const stepContainer = document.getElementById('step-container');
-            const treatmentStatus = document.getElementById('treatment-status');
+    const searchBar = document.getElementById('searchBar');
+    const injuryContainer = document.getElementById('injury-container');
+    const stepContainer = document.getElementById('step-container');
+    const treatmentStatus = document.getElementById('treatment-status');
 
-            // 初始化主控台
-            function initMedicalTab() {
-                    renderInjuryList();
-                    checkAndSkipDivider();
-                    renderSteps();
-                    renderDrugTable();
-                    calculateTotalFee(); // 初始化計價面板數據
-                    initDiagnosticHelper(); // ✨ 新增這行：初始化診斷器
-                }
-            function checkAndSkipDivider() {
-                const steps = treatmentMessages[currentInjuryKey]?.steps || [];
-                if (steps[currentStepIndex] && steps[currentStepIndex].startsWith('----')) currentStepIndex++;
+    // 初始化主控台
+    function initMedicalTab() {
+        renderInjuryList();
+        checkAndSkipDivider();
+        renderSteps();
+        renderDrugTable();
+        calculateTotalFee(); // 初始化計價面板數據
+        initDiagnosticHelper(); // 初始化診斷器
+    }
+    function checkAndSkipDivider() {
+        const steps = treatmentMessages[currentInjuryKey]?.steps || [];
+        if (steps[currentStepIndex] && steps[currentStepIndex].startsWith('----')) currentStepIndex++;
+    }
+    searchBar.addEventListener('input', () => {
+        const query = searchBar.value.toLowerCase().trim();
+        filteredKeys = Object.keys(treatmentMessages).filter(key => treatmentMessages[key].name.toLowerCase().includes(query) || key.includes(query));
+        renderInjuryList();
+        if (filteredKeys.length > 0 && !filteredKeys.includes(currentInjuryKey)) selectInjury(filteredKeys[0]);
+    });
+    function renderInjuryList() {
+        injuryContainer.innerHTML = '';
+        filteredKeys.forEach(key => {
+            const div = document.createElement('div');
+            div.className = `injury-item ${key === currentInjuryKey ? 'active' : ''}`;
+            div.innerText = treatmentMessages[key].name;
+            div.onclick = () => selectInjury(key);
+            injuryContainer.appendChild(div);
+        });
+    }
+    function selectInjury(key) {
+        currentInjuryKey = key;
+        currentStepIndex = 0;
+        renderInjuryList();
+        checkAndSkipDivider();
+        renderSteps();
+    }
+
+    // 優化渲染步驟與醫囑樣式
+    function renderSteps() {
+        stepContainer.innerHTML = '';
+        const data = treatmentMessages[currentInjuryKey];
+        if (!data) return;
+
+        // 1. 渲染處置步驟 (steps)
+        data.steps.forEach((text, index) => {
+            const div = document.createElement('div');
+            if (text.startsWith('----')) {
+                div.className = 'section-divider';
+                div.innerText = text.replace(/^-+\s*|\s*-+$/g, '');
+                stepContainer.appendChild(div);
+                return;
             }
-            searchBar.addEventListener('input', () => {
-                const query = searchBar.value.toLowerCase().trim();
-                filteredKeys = Object.keys(treatmentMessages).filter(key => treatmentMessages[key].name.toLowerCase().includes(query) || key.includes(query));
-                renderInjuryList();
-                if (filteredKeys.length > 0 && !filteredKeys.includes(currentInjuryKey)) selectInjury(filteredKeys[0]);
-            });
-            function renderInjuryList() {
-                injuryContainer.innerHTML = '';
-                filteredKeys.forEach(key => {
-                    const div = document.createElement('div');
-                    div.className = `injury-item ${key === currentInjuryKey ? 'active' : ''}`;
-                    div.innerText = treatmentMessages[key].name;
-                    div.onclick = () => selectInjury(key);
-                    injuryContainer.appendChild(div);
-                });
-            }
-            function selectInjury(key) {
-                currentInjuryKey = key;
-                currentStepIndex = 0;
-                renderInjuryList();
+            div.className = 'step-item';
+            if (index === currentStepIndex) div.classList.add('next-up');
+            if (index < currentStepIndex) div.classList.add('copied');
+            div.innerHTML = `<div class="d-flex justify-content-between align-items-center"><span>${text}</span><span class="copy-badge">${index === currentStepIndex ? 'ENTER 複製' : (index < currentStepIndex ? '已複製' : '點擊複製')}</span></div>`;
+            div.onclick = () => {
+                copyText(text, treatmentStatus);
+                currentStepIndex = index + 1;
                 checkAndSkipDivider();
                 renderSteps();
-            }
-
-            // ✨ ✨ ✨ 【修改重点 1】優化渲染步驟與醫囑樣式 ✨ ✨ ✨
-            function renderSteps() {
-                    stepContainer.innerHTML = '';
-                    const data = treatmentMessages[currentInjuryKey];
-                    if (!data) return;
-
-                    // 1. 渲染處置步驟 (steps)
-                    data.steps.forEach((text, index) => {
-                        const div = document.createElement('div');
-                        if (text.startsWith('----')) {
-                            div.className = 'section-divider';
-                            div.innerText = text.replace(/^-+\s*|\s*-+$/g, '');
-                            stepContainer.appendChild(div);
-                            return;
-                        }
-                        div.className = 'step-item';
-                        if (index === currentStepIndex) div.classList.add('next-up');
-                        if (index < currentStepIndex) div.classList.add('copied');
-                        div.innerHTML = `<div class="d-flex justify-content-between align-items-center"><span>${text}</span><span class="copy-badge">${index === currentStepIndex ? 'ENTER 複製' : (index < currentStepIndex ? '已複製' : '點擊複製')}</span></div>`;
-                        div.onclick = () => {
-                            copyText(text, treatmentStatus);
-                            currentStepIndex = index + 1;
-                            checkAndSkipDivider();
-                            renderSteps();
-                        };
-                        stepContainer.appendChild(div);
-                    });
-
-                    // 2. 渲染純口述醫囑提示（移除複製功能與 badge）
-                    if (data.note) {
-                        // 建立一個區隔標籤
-                        const divider = document.createElement('div');
-                        divider.className = 'section-divider';
-                        divider.style.color = '#ffb703'; // 使用警告黃色強調
-                        divider.innerText = '醫囑與注意事項 (純口述內容)';
-                        stepContainer.appendChild(divider);
-
-                        // 建立純顯示的 Note 區塊
-                        const noteDiv = document.createElement('div');
-                        noteDiv.className = 'medical-note-box'; // 套用下方專屬的純顯示樣式
-                        noteDiv.innerHTML = `<div class="note-content">💡 ${data.note}</div>`;
-
-                        stepContainer.appendChild(noteDiv);
-                    }
-                }
-
-            const drugTableBody = document.getElementById('drug-table-body');
-            const drugsStatus = document.getElementById('drugs-status');
-
-            function switchDrugCat(cat) {
-                currentDrugCat = cat;
-                document.querySelectorAll('#drug-cats-container .category-item').forEach(item => item.classList.toggle('active', item.dataset.cat === cat));
-                renderDrugTable();
-            }
-
-            function renderDrugTable() {
-                if (!drugTableBody) return; // 安全檢查
-                drugTableBody.innerHTML = '';
-                const targetDrugs = drugList.filter(d => d.type === currentDrugCat);
-
-                targetDrugs.forEach(drug => {
-                    const tr = document.createElement('tr');
-                    tr.className = 'drug-row';
-                    tr.innerHTML = `
-                            <td class="fw-bold text-white">${drug.name}</td>
-                            <td class="drug-effect-highlight">${drug.effect}</td>
-                            <td><div class="table-drug-me" title="${drug.me}">${drug.me}</div></td>
-                        `;
-                    tr.onclick = () => copyText(drug.me, drugsStatus);
-                    drugTableBody.appendChild(tr);
-                });
-            }
-
-            // ✨ ✨ ✨ 【修改重点 2】如果你程式碼後面有監聽鍵盤 Enter 鍵，請把原有的 Enter 改成下面這樣 ✨ ✨ ✨
-            window.addEventListener('keydown', (e) => {
-                // 這裡對應你原本程式碼裡的 Enter 鍵複製邏輯
-                if (e.key === 'Enter' && !e.shiftKey) {
-                    // 如果焦點不在搜尋框或輸入框才執行快捷鍵
-                    if (document.activeElement === searchBar || document.activeElement === input) return;
-
-                    const data = treatmentMessages[currentInjuryKey];
-                    if (!data) return;
-
-                    // 情況 A：還有手術步驟沒按完
-                    if (currentStepIndex < data.steps.length) {
-                        e.preventDefault();
-                        copyText(data.steps[currentStepIndex], treatmentStatus);
-                        currentStepIndex++;
-                        checkAndSkipDivider();
-                        renderSteps();
-                    }
-                    // 情況 B：步驟按完了，剛好停在醫囑（currentStepIndex 等於長度）
-                    else if (currentStepIndex === data.steps.length && data.note) {
-                        e.preventDefault();
-                        copyText(data.note, treatmentStatus);
-                        currentStepIndex++; // 結束本單
-                        renderSteps();
-                    }
-                    // 情況 C：全部處置完畢
-                    else {
-                        treatmentStatus.innerText = '✨ 本輪處置與醫囑已全部完成！按 F 搜尋下一單。';
-                    }
-                }
-            });
-
-        // ==========================================
-        // 💰 醫藥費功能中心 (排版優化 + 邊框動態反饋)
-        // ==========================================
-        const feePanel = document.getElementById('feePanel');
-        const feeTotalDisplay = document.getElementById('feeTotalDisplay');
-        const feeStatus = document.getElementById('fee-status');
-
-        // 醫藥費面板 展開/收合切換
-        function toggleFeePanel() {
-            const panel = document.getElementById('feePanel');
-            if (panel.style.display === 'none' || panel.style.display === '') {
-                panel.style.display = 'block';
-                calculateTotalFee(); // 展開時自動跑一次初始計算
-            } else {
-                panel.style.display = 'none';
-            }
-        }
-
-        // 醫藥費即時動態加總與明細預覽邏輯
-        let currentTotalFeeGlobal = 150;
-
-        function calculateTotalFee() {
-            let total = 0;
-            let itemsHtml = "<div class='text-white border-bottom border-secondary pb-1 mb-1 fw-bold'>🧾 MedLink 費用動態清單</div>";
-
-            // 1. 診察與基本車資 (Radio單選)
-            const activeRadio = document.querySelector('input[name="fee_base_ride"]:checked');
-            if (activeRadio) {
-                let basePrice = parseInt(activeRadio.value);
-                let baseName = activeRadio.getAttribute('data-name');
-                total += basePrice;
-                itemsHtml += `<div class='d-flex justify-content-between text-white-50'><span>• ${baseName}</span><span>$${basePrice}</span></div>`;
-            }
-
-            // 2. 特殊搜救加價 (Checkbox多選)
-            const waterCb = document.getElementById('fee_water');
-            if (waterCb && waterCb.checked) {
-                let val = parseInt(waterCb.value);
-                total += val;
-                itemsHtml += `<div class='d-flex justify-content-between text-white-50'><span>• 水中特搜救援</span><span>+$${val}</span></div>`;
-            }
-            const tunnelCb = document.getElementById('fee_tunnel');
-            if (tunnelCb && tunnelCb.checked) {
-                let val = parseInt(tunnelCb.value);
-                total += val;
-                itemsHtml += `<div class='d-flex justify-content-between text-white-50'><span>• 地形/地下道特搜</span><span>+$${val}</span></div>`;
-            }
-
-            // 3. 醫療處置與手術 (需勾選對應 Checkbox 才計入輸入框數值)
-            const checkCb = document.getElementById('fee_check_cb');
-            const checkValInput = document.getElementById('fee_check_val');
-            if (checkCb && checkCb.checked) {
-                let val = parseInt(checkValInput.value) || 0;
-                total += val;
-                itemsHtml += `<div class='d-flex justify-content-between text-white-50'><span>• 醫療檢查費用</span><span>$${val}</span></div>`;
-            }
-
-            const surgeryCb = document.getElementById('fee_surgery_cb');
-            const surgeryValInput = document.getElementById('fee_surgery_val');
-            if (surgeryCb && surgeryCb.checked) {
-                let val = parseInt(surgeryValInput.value) || 0;
-                total += val;
-                itemsHtml += `<div class='d-flex justify-content-between text-white-50'><span>• 手術/縫合處置費</span><span>$${val}</span></div>`;
-            }
-
-            // 4. 常規住院服務 (依輸入天數計算)
-            const stayInput = document.getElementById('fee_stay_input');
-            const stayTxt = document.getElementById('stay_nights_txt');
-            if (stayInput) {
-                let days = parseInt(stayInput.value) || 0;
-                if (days > 0) {
-                    let stayCost = days * 300;
-                    total += stayCost;
-                    stayTxt.innerText = `${days} 晚 (+$${stayCost})`;
-                    stayTxt.className = "text-warning small fw-bold font-monospace";
-                    itemsHtml += `<div class='d-flex justify-content-between text-white-50'><span>• 常規住院 (${days} 晚)</span><span>$${stayCost}</span></div>`;
-                } else {
-                    stayTxt.innerText = "不開立";
-                    stayTxt.className = "text-success small fw-bold font-monospace";
-                }
-            }
-
-            // 結尾加上應付總額
-            itemsHtml += `<div class='border-top border-secondary mt-1 pt-1 text-end text-success fw-bold'>應付總計：$${total}</div>`;
-
-            // 更新發票預覽區面板的內容
-            const invoiceContainer = document.getElementById('fee-invoice-items');
-            if (invoiceContainer) invoiceContainer.innerHTML = itemsHtml;
-
-            // 更新底部大按鈕顯示的總額與全域變數
-            currentTotalFeeGlobal = total;
-            if (feeTotalDisplay) feeTotalDisplay.innerText = `總計醫藥費：$${total} (點擊直接複製金額)`;
-        }
-
-        // 點擊複製純金額
-        function copyFeeResult() {
-            let msg = `${currentTotalFeeGlobal}`;
-            navigator.clipboard.writeText(msg).then(() => {
-                if (feeStatus) {
-                    feeStatus.innerText = `✅ 已成功複製總金額：$${currentTotalFeeGlobal}！`;
-                    setTimeout(() => feeStatus.innerText = '', 2000);
-                }
-            });
-        }
-
-        // 確保初始載入時先刷新一次
-        document.addEventListener("DOMContentLoaded", function () {
-            calculateTotalFee();
+            };
+            stepContainer.appendChild(div);
         });
 
-        // ==========================================
-        // 🛠️ 純 JS 分頁切換器
-        // ==========================================
-        function switchMainTab(targetTabId) {
-            document.querySelectorAll('.tab-content .tab-pane').forEach(pane => {
-                pane.classList.remove('show', 'active');
-            });
-            document.querySelectorAll('#mainTabs .nav-link').forEach(btn => {
-                btn.classList.remove('active');
-                btn.setAttribute('aria-selected', 'false');
-            });
+        // 2. 渲染純口述醫囑提示
+        if (data.note) {
+            const divider = document.createElement('div');
+            divider.className = 'section-divider';
+            divider.style.color = '#ffb703';
+            divider.innerText = '醫囑與注意事項 (純口述內容)';
+            stepContainer.appendChild(divider);
 
-            const targetPane = document.getElementById(targetTabId);
-            if (targetPane) {
-                targetPane.classList.add('show', 'active');
-            }
+            const noteDiv = document.createElement('div');
+            noteDiv.className = 'medical-note-box';
+            noteDiv.innerHTML = `<div class="note-content">💡 ${data.note}</div>`;
+            stepContainer.appendChild(noteDiv);
+        }
+    }
 
-            const targetBtn = document.querySelector(`[aria-controls="${targetTabId}"]`);
-            if (targetBtn) {
-                targetBtn.classList.add('active');
-                targetBtn.setAttribute('aria-selected', 'true');
-            }
+    const drugTableBody = document.getElementById('drug-table-body');
+    const drugsStatus = document.getElementById('drugs-status');
 
-            if (targetTabId === 'drugs-tab') {
-                renderDrugTable();
+    function switchDrugCat(cat) {
+        currentDrugCat = cat;
+        document.querySelectorAll('#drug-cats-container .category-item').forEach(item => item.classList.toggle('active', item.dataset.cat === cat));
+        renderDrugTable();
+    }
+
+    function renderDrugTable() {
+        if (!drugTableBody) return;
+        drugTableBody.innerHTML = '';
+        const targetDrugs = drugList.filter(d => d.type === currentDrugCat);
+
+        targetDrugs.forEach(drug => {
+            const tr = document.createElement('tr');
+            tr.className = 'drug-row';
+            tr.innerHTML = `
+                    <td class="fw-bold text-white">${drug.name}</td>
+                    <td class="drug-effect-highlight">${drug.effect}</td>
+                    <td><div class="table-drug-me" title="${drug.me}">${drug.me}</div></td>
+                `;
+            tr.onclick = () => copyText(drug.me, drugsStatus);
+            drugTableBody.appendChild(tr);
+        });
+    }
+
+    // ==========================================
+    // 💰 醫藥費功能中心
+    // ==========================================
+    const feePanel = document.getElementById('feePanel');
+    const feeTotalDisplay = document.getElementById('feeTotalDisplay');
+    const feeStatus = document.getElementById('fee-status');
+
+    function toggleFeePanel() {
+        const panel = document.getElementById('feePanel');
+        if (panel.style.display === 'none' || panel.style.display === '') {
+            panel.style.display = 'block';
+            calculateTotalFee();
+        } else {
+            panel.style.display = 'none';
+        }
+    }
+
+    let currentTotalFeeGlobal = 150;
+
+    function calculateTotalFee() {
+        let total = 0;
+        let itemsHtml = "<div class='text-white border-bottom border-secondary pb-1 mb-1 fw-bold'>🧾 MedLink 費用動態清單</div>";
+
+        const activeRadio = document.querySelector('input[name="fee_base_ride"]:checked');
+        if (activeRadio) {
+            let basePrice = parseInt(activeRadio.value);
+            let baseName = activeRadio.getAttribute('data-name');
+            total += basePrice;
+            itemsHtml += `<div class='d-flex justify-content-between text-white-50'><span>• ${baseName}</span><span>$${basePrice}</span></div>`;
+        }
+
+        const waterCb = document.getElementById('fee_water');
+        if (waterCb && waterCb.checked) {
+            let val = parseInt(waterCb.value);
+            total += val;
+            itemsHtml += `<div class='d-flex justify-content-between text-white-50'><span>• 水中特搜救援</span><span>+$${val}</span></div>`;
+        }
+        const tunnelCb = document.getElementById('fee_tunnel');
+        if (tunnelCb && tunnelCb.checked) {
+            let val = parseInt(tunnelCb.value);
+            total += val;
+            itemsHtml += `<div class='d-flex justify-content-between text-white-50'><span>• 地形/地下道特搜</span><span>+$${val}</span></div>`;
+        }
+
+        const checkCb = document.getElementById('fee_check_cb');
+        const checkValInput = document.getElementById('fee_check_val');
+        if (checkCb && checkCb.checked) {
+            let val = parseInt(checkValInput.value) || 0;
+            total += val;
+            itemsHtml += `<div class='d-flex justify-content-between text-white-50'><span>• 醫療檢查費用</span><span>$${val}</span></div>`;
+        }
+
+        const surgeryCb = document.getElementById('fee_surgery_cb');
+        const surgeryValInput = document.getElementById('fee_surgery_val');
+        if (surgeryCb && surgeryCb.checked) {
+            let val = parseInt(surgeryValInput.value) || 0;
+            total += val;
+            itemsHtml += `<div class='d-flex justify-content-between text-white-50'><span>• 手術/縫合處置費</span><span>$${val}</span></div>`;
+        }
+
+        const stayInput = document.getElementById('fee_stay_input');
+        const stayTxt = document.getElementById('stay_nights_txt');
+        if (stayInput) {
+            let days = parseInt(stayInput.value) || 0;
+            if (days > 0) {
+                let stayCost = days * 300;
+                total += stayCost;
+                stayTxt.innerText = `${days} 晚 (+$${stayCost})`;
+                stayTxt.className = "text-warning small fw-bold font-monospace";
+                itemsHtml += `<div class='d-flex justify-content-between text-white-50'><span>• 常規住院 (${days} 晚)</span><span>$${stayCost}</span></div>`;
+            } else {
+                stayTxt.innerText = "不開立";
+                stayTxt.className = "text-success small fw-bold font-monospace";
             }
         }
 
- 
+        itemsHtml += `<div class='border-top border-secondary mt-1 pt-1 text-end text-success fw-bold'>應付總計：$${total}</div>`;
+
+        const invoiceContainer = document.getElementById('fee-invoice-items');
+        if (invoiceContainer) invoiceContainer.innerHTML = itemsHtml;
+
+        currentTotalFeeGlobal = total;
+        if (feeTotalDisplay) feeTotalDisplay.innerText = `總計醫藥費：$${total} (點擊直接複製金額)`;
+    }
+
+    function copyFeeResult() {
+        let msg = `${currentTotalFeeGlobal}`;
+        navigator.clipboard.writeText(msg).then(() => {
+            if (feeStatus) {
+                feeStatus.innerText = `✅ 已成功複製總金額：$${currentTotalFeeGlobal}！`;
+                setTimeout(() => feeStatus.innerText = '', 2000);
+            }
+        });
+    }
+
+    document.addEventListener("DOMContentLoaded", function () {
+        calculateTotalFee();
+    });
+
+    // 🛠️ 純 JS 分頁切換器
+    function switchMainTab(targetTabId) {
+        document.querySelectorAll('.tab-content .tab-pane').forEach(pane => {
+            pane.classList.remove('show', 'active');
+        });
+        document.querySelectorAll('#mainTabs .nav-link').forEach(btn => {
+            btn.classList.remove('active');
+            btn.setAttribute('aria-selected', 'false');
+        });
+
+        const targetPane = document.getElementById(targetTabId);
+        if (targetPane) {
+            targetPane.classList.add('show', 'active');
+        }
+
+        const targetBtn = document.querySelector(`[aria-controls="${targetTabId}"]`);
+        if (targetBtn) {
+            targetBtn.classList.add('active');
+            targetBtn.setAttribute('aria-selected', 'true');
+        }
+
+        if (targetTabId === 'drugs-tab') {
+            renderDrugTable();
+        }
+    }
+
     // ==========================================
-    // ⌨️ 鍵盤快捷鍵管理（修復版：確保調度 Enter 自動複製）
+    // ⌨️ 鍵盤快捷鍵管理（全網唯一整合防抖版）
     // ==========================================
+    let isProcessingEnter = false;
+
     document.addEventListener('keydown', (e) => {
         const isDispatchActive = document.getElementById('dispatch-tab')?.classList.contains('active');
         const isTreatmentActive = document.getElementById('treatment-tab')?.classList.contains('active');
         const isDiagnosticActive = document.getElementById('diagnostic-tab')?.classList.contains('active');
         const isDrugsActive = document.getElementById('drugs-tab')?.classList.contains('active');
 
-        // 1. 全域 Tab 鍵切換分頁（排除搜尋框與計價器數字欄位）
+        // 1. 全域 Tab 鍵切換分頁
         if (e.key === 'Tab' && document.activeElement !== searchBar && document.activeElement.type !== 'number') {
             e.preventDefault();
-
-            if (isDispatchActive) {
-                switchMainTab('diagnostic-tab'); // 調度 -> 診斷
-            } else if (isDiagnosticActive) {
-                switchMainTab('treatment-tab');  // 診斷 -> 主控台
-            } else if (isTreatmentActive) {
-                switchMainTab('drugs-tab');      // 主控台 -> 常用藥
-            } else if (isDrugsActive) {
-                switchMainTab('dispatch-tab');   // 常用藥 -> 調度
-            }
-            return; // 切換完直接結束，防範干擾
+            if (isDispatchActive) switchMainTab('diagnostic-tab');
+            else if (isDiagnosticActive) switchMainTab('treatment-tab');
+            else if (isTreatmentActive) switchMainTab('drugs-tab');
+            else if (isDrugsActive) switchMainTab('dispatch-tab');
+            return;
         }
 
         // 2. 【調度面板】專屬快捷鍵
@@ -1417,12 +1361,12 @@
                 const val = input.value.trim();
                 if (val !== "") {
                     e.preventDefault();
-                    copyDispatch();       // 執行自動複製
-                    input.value = '';     // 清空輸入框
-                    updateDispatchOutput(); // 刷新顯示
+                    copyDispatch();
+                    input.value = '';
+                    updateDispatchOutput();
                 }
             }
-            return; // 調度面板邏輯結束，不往下跑
+            return;
         }
 
         // 3. 【醫療主控台】專屬快捷鍵
@@ -1435,7 +1379,7 @@
                 return;
             }
 
-            // 搜尋框處於焦點時的上下鍵與 Enter 邏輯
+            // 搜尋框焦點邏輯
             if (document.activeElement === searchBar) {
                 let currentIndex = filteredKeys.indexOf(currentInjuryKey);
                 if (e.key === 'ArrowDown') {
@@ -1453,12 +1397,22 @@
                 return;
             }
 
-            // 核心：主控台處於非搜尋狀態下的 Enter 流程（包含手術步驟與出院醫囑）
+            // 主控台 Enter 流程
             if (e.key === 'Enter' && !e.shiftKey) {
+                if (document.activeElement === searchBar || document.activeElement === input) return;
+
+                // 防抖攔截
+                if (isProcessingEnter) {
+                    e.preventDefault();
+                    return;
+                }
+
                 const data = treatmentMessages[currentInjuryKey];
                 if (!data) return;
 
-                // 情況 A：還有手術步驟沒按完
+                isProcessingEnter = true;
+
+                // 情況 A：手術步驟
                 if (currentStepIndex < data.steps.length) {
                     e.preventDefault();
                     copyText(data.steps[currentStepIndex], treatmentStatus);
@@ -1466,31 +1420,34 @@
                     checkAndSkipDivider();
                     renderSteps();
                 }
-                // 情況 B：步驟按完了，剛好停在醫囑（currentStepIndex 等於長度）
+                // 情況 B：醫囑提示（純口述，不執行自動複製，直接結束本單）
                 else if (currentStepIndex === data.steps.length && data.note) {
                     e.preventDefault();
-                    copyText(data.note, treatmentStatus);
-                    currentStepIndex++; // 結束本單
+                    currentStepIndex++;
                     renderSteps();
                 }
                 // 情況 C：全部處置完畢
                 else {
                     treatmentStatus.innerText = '✨ 本輪處置與醫囑已全部完成！按 F 搜尋下一單。';
                 }
+
+                setTimeout(() => {
+                    isProcessingEnter = false;
+                }, 200); // 縮短至 200 毫秒，防連擊同時不影響手速
             }
         }
     });
 
-        function copyDispatch() {
-            const text = dispatchOutput.innerText;
-            if (text === '等待輸入...') return;
-            navigator.clipboard.writeText(text).then(() => {
-                dispatchStatus.innerText = '✅ 已複製調度指令！';
-                setTimeout(() => dispatchStatus.innerText = '', 2000);
-            });
-        }
+    function copyDispatch() {
+        const text = dispatchOutput.innerText;
+        if (text === '等待輸入...') return;
+        navigator.clipboard.writeText(text).then(() => {
+            dispatchStatus.innerText = '✅ 已複製調度指令！';
+            setTimeout(() => dispatchStatus.innerText = '', 2000);
+        });
+    }
 
-        initMedicalTab();
+    initMedicalTab();
     </script>
 </body>
 
