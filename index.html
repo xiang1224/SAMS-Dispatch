@@ -1385,69 +1385,101 @@
             }
         }
 
-        // ==========================================
-        // 鍵盤快捷鍵管理
-        // ==========================================
-        document.addEventListener('keydown', (e) => {
-            const isDispatchActive = document.getElementById('dispatch-tab')?.classList.contains('active');
-            const isTreatmentActive = document.getElementById('treatment-tab')?.classList.contains('active');
-            const isDiagnosticActive = document.getElementById('diagnostic-tab').classList.contains('active');
-            const isDrugsActive = document.getElementById('drugs-tab')?.classList.contains('active');
+ 
+    // ==========================================
+    // ⌨️ 鍵盤快捷鍵管理（修復版：確保調度 Enter 自動複製）
+    // ==========================================
+    document.addEventListener('keydown', (e) => {
+        const isDispatchActive = document.getElementById('dispatch-tab')?.classList.contains('active');
+        const isTreatmentActive = document.getElementById('treatment-tab')?.classList.contains('active');
+        const isDiagnosticActive = document.getElementById('diagnostic-tab')?.classList.contains('active');
+        const isDrugsActive = document.getElementById('drugs-tab')?.classList.contains('active');
 
-            // 1. 全域 Tab 鍵切換分頁（排除搜尋框與計價器數字欄位）
-            if (e.key === 'Tab' && document.activeElement !== searchBar && document.activeElement.type !== 'number') {
+        // 1. 全域 Tab 鍵切換分頁（排除搜尋框與計價器數字欄位）
+        if (e.key === 'Tab' && document.activeElement !== searchBar && document.activeElement.type !== 'number') {
+            e.preventDefault();
+
+            if (isDispatchActive) {
+                switchMainTab('diagnostic-tab'); // 調度 -> 診斷
+            } else if (isDiagnosticActive) {
+                switchMainTab('treatment-tab');  // 診斷 -> 主控台
+            } else if (isTreatmentActive) {
+                switchMainTab('drugs-tab');      // 主控台 -> 常用藥
+            } else if (isDrugsActive) {
+                switchMainTab('dispatch-tab');   // 常用藥 -> 調度
+            }
+            return; // 切換完直接結束，防範干擾
+        }
+
+        // 2. 【調度面板】專屬快捷鍵
+        if (isDispatchActive) {
+            if (e.key === 'Enter') {
+                const val = input.value.trim();
+                if (val !== "") {
+                    e.preventDefault();
+                    copyDispatch();       // 執行自動複製
+                    input.value = '';     // 清空輸入框
+                    updateDispatchOutput(); // 刷新顯示
+                }
+            }
+            return; // 調度面板邏輯結束，不往下跑
+        }
+
+        // 3. 【醫療主控台】專屬快捷鍵
+        if (isTreatmentActive) {
+            // 按 F 聚焦搜尋框
+            if (e.key.toLowerCase() === 'f' && document.activeElement !== searchBar) {
                 e.preventDefault();
+                searchBar.focus();
+                searchBar.select();
+                return;
+            }
 
-                if (isDispatchActive) {
-                    switchMainTab('diagnostic-tab'); // 調度 -> 診斷
-                } else if (isDiagnosticActive) {
-                    switchMainTab('treatment-tab');  // 診斷 -> 主控台
-                } else if (isTreatmentActive) {
-                    switchMainTab('drugs-tab');      // 主控台 -> 常用藥
-                } else if (isDrugsActive) {
-                    switchMainTab('dispatch-tab');   // 常用藥 -> 調度
+            // 搜尋框處於焦點時的上下鍵與 Enter 邏輯
+            if (document.activeElement === searchBar) {
+                let currentIndex = filteredKeys.indexOf(currentInjuryKey);
+                if (e.key === 'ArrowDown') {
+                    e.preventDefault();
+                    selectInjury(filteredKeys[(currentIndex + 1) % filteredKeys.length]);
+                }
+                if (e.key === 'ArrowUp') {
+                    e.preventDefault();
+                    selectInjury(filteredKeys[(currentIndex - 1 + filteredKeys.length) % filteredKeys.length]);
+                }
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    searchBar.blur();
                 }
                 return;
             }
 
-            // 2. 個別分頁內的快捷鍵
-            if (isDispatchActive) {
-                if (e.key === 'Tab') {
+            // 核心：主控台處於非搜尋狀態下的 Enter 流程（包含手術步驟與出院醫囑）
+            if (e.key === 'Enter' && !e.shiftKey) {
+                const data = treatmentMessages[currentInjuryKey];
+                if (!data) return;
+
+                // 情況 A：還有手術步驟沒按完
+                if (currentStepIndex < data.steps.length) {
                     e.preventDefault();
-                    setDispatchMode(currentDispatchMode === 'dispatched' ? 'gps' : 'dispatched');
-                    return;
+                    copyText(data.steps[currentStepIndex], treatmentStatus);
+                    currentStepIndex++;
+                    checkAndSkipDivider();
+                    renderSteps();
                 }
-                if (e.key === 'Enter' && input.value.trim() !== "") {
-                    copyDispatch();
-                    input.value = '';
-                    updateDispatchOutput();
-                }
-            } else if (isTreatmentActive) {
-                if (e.key.toLowerCase() === 'f' && document.activeElement !== searchBar) {
+                // 情況 B：步驟按完了，剛好停在醫囑（currentStepIndex 等於長度）
+                else if (currentStepIndex === data.steps.length && data.note) {
                     e.preventDefault();
-                    searchBar.focus();
-                    searchBar.select();
+                    copyText(data.note, treatmentStatus);
+                    currentStepIndex++; // 結束本單
+                    renderSteps();
                 }
-                if (document.activeElement === searchBar) {
-                    let currentIndex = filteredKeys.indexOf(currentInjuryKey);
-                    if (e.key === 'ArrowDown') { e.preventDefault(); selectInjury(filteredKeys[(currentIndex + 1) % filteredKeys.length]); }
-                    if (e.key === 'ArrowUp') { e.preventDefault(); selectInjury(filteredKeys[(currentIndex - 1 + filteredKeys.length) % filteredKeys.length]); }
-                    if (e.key === 'Enter') { e.preventDefault(); searchBar.blur(); }
-                    return;
-                }
-                if (e.key === 'Enter') {
-                    const steps = treatmentMessages[currentInjuryKey].steps;
-                    if (currentStepIndex < steps.length) {
-                        copyText(steps[currentStepIndex], treatmentStatus);
-                        currentStepIndex++;
-                        checkAndSkipDivider();
-                        renderSteps();
-                    } else {
-                        treatmentStatus.innerText = '✨ 本輪處置已全部完成！按 F 搜尋下一單。';
-                    }
+                // 情況 C：全部處置完畢
+                else {
+                    treatmentStatus.innerText = '✨ 本輪處置與醫囑已全部完成！按 F 搜尋下一單。';
                 }
             }
-        });
+        }
+    });
 
         function copyDispatch() {
             const text = dispatchOutput.innerText;
